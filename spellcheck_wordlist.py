@@ -61,6 +61,7 @@ from wikispell.SpellcheckLib import Word, WrongWord
 from wikispell.SpellcheckLib import readBlacklist
 from wikispell.SpellcheckLib import InteractiveWordReplacer
 from wikispell.SpellcheckLib import abstract_Spellchecker
+from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
 import numpy
 
 NUMBER_PAGES = 60
@@ -209,7 +210,6 @@ def loadPagesWiki(wr, correctWords_page, ignorePages_page):
 
     wr.ignorePages = ignorePages
     wr.ignorePerPages = correctWords
-
 
 def collectBlacklistPages(batchNr, gen, badDict):
     """Collect all wrong words in the provided page generator.
