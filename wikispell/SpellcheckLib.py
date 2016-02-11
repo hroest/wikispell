@@ -16,6 +16,14 @@ import pagegenerators
 import textrange_parser
 import codecs
 
+class SpecialTerm(object):
+    def __init__(self, text):
+        self.style = text
+
+
+edit = SpecialTerm("edit")
+endpage = SpecialTerm("end page")
+
 class Word(object):
 
     def __init__(self, text):
@@ -172,6 +180,92 @@ class CallbackObject(object):
         self.error = error
         self.optReturn1 = optReturn1
         self.optReturn2 = optReturn2
+
+def askAlternative(bigword, knownwords = {}, newwords = [], context=None, title='', replaceBy=None,correct_html_codes=False):
+    word = bigword.derive()
+    correct = None
+    pywikibot.output(u"=" * 60)
+    pywikibot.output(u"Found unknown word '%s' in '%s'" % (word, title))
+    if context:
+        pywikibot.output(u"Context:")
+        pywikibot.output(u"" + context)
+        pywikibot.output(u"-" * 60)
+    while not correct:
+        w_alternatives = bigword.getAlternatives()
+        for i in xrange(len(w_alternatives)):
+            pywikibot.output(u"%s: Replace by '%s'"
+                             % (i+1,
+                                w_alternatives[i]))
+        pywikibot.output(u"a: Add '%s' as correct"%word)
+        if word[0].isupper():
+            pywikibot.output(u"c: Add '%s' as correct" % (uncap(word)))
+        pywikibot.output(u"i: Ignore once (default)")
+        pywikibot.output(u"p: Ignore on this page")
+        pywikibot.output(u"r: Replace text")
+        pywikibot.output(u"s: Replace text, but do not save as alternative")
+        pywikibot.output(u"g: Guess (give me a list of similar words)")
+        pywikibot.output(u"*: Edit by hand")
+        pywikibot.output(u"x: Do not check the rest of this page")
+        answer = pywikibot.input(u":")
+        if answer == "":
+            answer = "i"
+        if answer in "aAiIpP":
+            correct = word
+            if answer in "aA":
+                knownwords[word] = word
+                newwords.append(word)
+            elif answer in "pP":
+                pageskip.append(word)
+        elif answer in "rRsS":
+            correct = pywikibot.input(u"What should I replace it by?")
+            if answer in "rR":
+                if correct_html_codes:
+                    correct = removeHTML(correct)
+                if correct != cap(word) and \
+                   correct != uncap(word) and \
+                   correct != word:
+                    try:
+                        knownwords[word] += [correct.replace(' ', '_')]
+                    except KeyError:
+                        knownwords[word] = [correct.replace(' ', '_')]
+                    newwords.append(word)
+                knownwords[correct] = correct
+                if not replaceBy is None: replaceBy[word] = correct
+                newwords.append(correct)
+        elif answer in "cC" and word[0].isupper():
+            correct = word
+            knownwords[uncap(word)] = uncap(word)
+            newwords.append(uncap(word))
+        elif answer in "gG":
+            possible = getalternatives(word)
+            if possible:
+                print "Found alternatives:"
+                for pos in possible:
+                    pywikibot.output("  %s" % pos)
+            else:
+                print "No similar words found."
+        elif answer == "*":
+            correct = edit
+        elif answer == "x":
+            correct = endpage
+        else:
+            for i in xrange(len(w_alternatives)):
+                if answer == str(i + 1):
+                    correct = w_alternatives[i]
+                    if not replaceBy is None: replaceBy[word] = correct
+    return correct
+
+def uncap(string):
+    # uncapitalize the first word of the string
+    if len(string) > 1:
+        return string[0].lower() + string[1:]
+    else:
+        return string.lower()
+
+
+def cap(string):
+    # uncapitalize the first word of the string
+    return string[0].upper() + string[1:]
 
 def findRange(opening, closing, text, start=0, alternativeBreak = None,
              ignore_in = [] ):
