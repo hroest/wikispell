@@ -10,7 +10,7 @@ A class for storing a wrong word identified during spellcheck
 
 import time, sys
 import re, string
-from SpellcheckLib import abstract_Spellchecker
+from SpellcheckLib import abstract_Spellchecker, InteractiveWordReplacer
 from Word import Word, WrongWord
 
 class BlacklistSpellchecker(abstract_Spellchecker):
