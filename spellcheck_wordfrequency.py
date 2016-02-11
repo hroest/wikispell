@@ -20,6 +20,9 @@ from wikispell.BlacklistChecker import BlacklistChecker
 # Database config
 MYSQL_CONFIG = "~/.my.cnf.hroest"
 db_dump = "20160203";
+db_dump = "wikiwords.countedwords_20160203";
+WORD_MINOCC = 1000;
+WORD_MINLEN = 13;
 
 ################################################################################
 # Find the most common words and search for missspells of those 
@@ -29,10 +32,10 @@ cursor = db.cursor()
 
 cursor.execute(
 """
-select * from wikiwords.countedwords_%s where occurence > 1000
-and length(smallword) > 13
+select * from wikiwords.countedwords_%s where occurence > %s
+and length(smallword) > %s
 order by occurence DESC
-"""  % db_dump)
+"""  % (db_dump, WORD_MINOCC, WORD_MINLEN))
 misspell = cursor.fetchall()
 
 bb = BlacklistChecker.Blacklistchecker()
@@ -53,7 +56,7 @@ try:
         #   - askUser
         candidates = bb.find_candidates(myw, cursor,
                                 occurence_cutoff = 25, lcutoff = 0.85, ldistance = 2,
-                                db_='wikiwords.countedwords_%s' % db_dump)
+                                db_=db_dump)
         print "nr candidates", len(candidates)
 
         if len(candidates) == 0: 
