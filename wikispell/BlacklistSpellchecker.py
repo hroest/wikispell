@@ -11,7 +11,7 @@ A class for storing a wrong word identified during spellcheck
 import time, sys
 import re, string
 from SpellcheckLib import abstract_Spellchecker
-from Word import Word
+from Word import Word, WrongWord
 
 class BlacklistSpellchecker(abstract_Spellchecker):
     """ Blacklist based spellchecker
