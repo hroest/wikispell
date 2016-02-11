@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
+"""
+A class used for frequency-based word processing.
+"""
 
 import re
 import wikipedia
@@ -16,7 +19,7 @@ try:
 except Exception:
     pass
 
-class Blacklistchecker():
+class WordFrequencyChecker():
 
     def __init__(self, load=True):
         self.replace = {}
