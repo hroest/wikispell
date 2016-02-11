@@ -13,7 +13,7 @@ import pagegenerators
 import wikipedia as pywikibot
 
 from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
-from wikispell.BlacklistChecker import BlacklistChecker
+from wikispell.WordFrequencyChecker import WordFrequencyChecker
 
 ################################################################################
 
@@ -38,7 +38,7 @@ order by occurence DESC
 """  % (db_dump, WORD_MINOCC, WORD_MINLEN))
 misspell = cursor.fetchall()
 
-bb = BlacklistChecker.Blacklistchecker()
+bb = WordFrequencyChecker()
 sp = BlacklistSpellchecker()
 
 try:
