@@ -12,6 +12,8 @@ Run this script with 2 arguments
 - location of the xml dump (dewiki-latest-pages-articles.xml.bz2)
 - mysql table to create
 
+This script will keep all words in memory and write them to a table after
+processing a whole XML dump.  Note that this can be memory intensive.
 """ 
 
 import MySQLdb
@@ -24,6 +26,7 @@ import xmlreader
 
 from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
 
+MYSQL_CONFIG = "~/.my.cnf.hroest"
 xml_dump = sys.argv[1]
 table = sys.argv[2]
 
@@ -47,7 +50,7 @@ for i, page in enumerate(gen):
         tmp = res.get( p[1], 0)
         res[ p[1] ] = tmp+1
 
-db = MySQLdb.connect(read_default_file="~/.my.cnf.hroest")
+db = MySQLdb.connect(read_default_file=MYSQL_CONFIG)
 db.autocommit(True)
 cursor = db.cursor()
 

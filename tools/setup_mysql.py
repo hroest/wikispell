@@ -12,7 +12,8 @@ Run this script with 2 arguments
 - location of the xml dump (dewiki-latest-pages-articles.xml.bz2)
 - mysql table to create
 
-This script will simply create a single table with all words, which then needs to processed further.
+This script will simply create a single table with all words, which then needs
+to processed further. Note that this can be disk-space intensive.
 """ 
 
 import MySQLdb
@@ -24,13 +25,19 @@ import sys
 import xmlreader
 from spellcheck_wordlist import BlacklistSpellchecker
 
+MYSQL_CONFIG = "~/.my.cnf.hroest"
 db_dump = sys.argv[1]
 xml_dump = sys.argv[2]
 
 print "Working with database ", db_dump
 print "Working with file ", xml_dump
 
-db = MySQLdb.connect(read_default_file="~/.my.cnf.hroest")
+cursor.execute( """create table %s (
+    article_id int,
+    smallword varchar(255)
+) ENGINE = MYISAM; """ % db_dump)
+
+db = MySQLdb.connect(read_default_file=MYSQL_CONFIG)
 db.autocommit(True)
 cursor = db.cursor()
 sp = BlacklistSpellchecker()
@@ -44,18 +51,19 @@ for i, page in enumerate(gen):
         print i, page.title
 
     prepare = [ [page.id, p.encode('utf8')] for p in sp.spellcheck_blacklist(page.text, {}, return_for_db=True)]
-    table = "insert into hroest.all_words_%s" % db_dump 
+    table = "insert into %s" % db_dump 
     tmp = cursor.executemany( table + " (article_id, smallword) values (%s,%s)", prepare )
     db.commit()
 
-# cursor.execute( "select count(*) from hroest.all_words_20151002" )
-
 """
-drop table hroest.countedwords_%(dump)s ;
+Next, execute these commands:
+
+drop table hroest.countedwords_%(dump)s;
 create table countedwords_%(dump)s as
 select count(*)  as occurence, smallword as word from
 all_words_%(dump)s group by smallword;
 alter table hroest.countedwords_%(dump)s add index(occurence);
 alter table hroest.countedwords_%(dump)s add index(word);
+
 """ 
 
