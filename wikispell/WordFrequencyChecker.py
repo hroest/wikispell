@@ -2,6 +2,11 @@
 # -*- coding: utf-8  -*-
 """
 A class used for frequency-based word processing.
+
+Use this class to identify potential candidates using find_candidates based on a given word.
+Then use load_candidates to identify pages in the Wiki where these words occur.
+Finally use checkit to go through the words.
+
 """
 
 import re
@@ -25,7 +30,6 @@ class WordFrequencyChecker():
         self.replace = {}
         self.noall = []
         self.rcount = {}
-        self.replaceDerivatives = {}
         self.replaceNew = {}
         if load:
             self.load_wikipedia()
@@ -107,12 +111,12 @@ class WordFrequencyChecker():
 
             if not replacecount.has_key(mywrong): replacecount[mywrong] = 0
             pywikibot.showDiff(text, newtext)
-            a = self.ask_user_input(page, mywrong, correct, newtext, text)
+            a = self._ask_user_input(page, mywrong, correct, newtext, text)
             if a is not None and a == "x":
                 print "Exit, go to next"
                 return
 
-    def ask_user_input(self, page, wrong, correct, newtext, text):
+    def _ask_user_input(self, page, wrong, correct, newtext, text):
         """
         Takes a page and a list of words to replace and asks the user for each one
         """
@@ -165,27 +169,6 @@ class WordFrequencyChecker():
                 return "x"
             else: 
                 return None
-
-    def searchDerivatives(self, wrongs, corrects, cursor, notlike='', db='hroest.countedwords'):
-        q = """ select * from %s
-        where smallword like '%s' 
-        and smallword not like '%s'
-        order by occurence DESC; """ % (db, wrongs+'%', notlike) 
-        cursor.execute( q )
-        allwrong = cursor.fetchall()
-        for wrong in allwrong:
-            wrong = wrong[1]
-            wrong = wrong.decode('utf8')
-            correct = wrong.replace( wrongs, corrects)
-            correct = correct.decode('utf8')
-            if correct == wrong: 
-                correct = wrong.replace( wrongs[1:], corrects[1:])
-            print wrong, correct
-            testdic = {}
-            self.searchNreplace(wrong, correct, testdic)
-            if len(testdic) > 0:
-                if not self.replaceDerivatives.has_key(wrongs): 
-                    self.replaceDerivatives[wrongs] = corrects
 
     #
     ## Find and evaluate Levenshtein candidates
@@ -389,13 +372,11 @@ class WordFrequencyChecker():
         self.replace = myreplace
         self.noall = mycorrect
         self.rcount = mycount
-        self.replaceDerivatives = myreplacedd
 
     def store_wikipedia(self):
         replace = self.replace
         noall = self.noall
         rcount = self.rcount
-        replaceDerivatives = self.replaceDerivatives
 
         s = ''
         for k in sorted(replace.keys()):
@@ -413,9 +394,4 @@ class WordFrequencyChecker():
         mypage = pywikibot.Page(pywikibot.getSite(), 'User:HRoestTypo/replacCount')
         mypage.put_async( s )
         s = ''
-        for k in sorted(replaceDerivatives.keys()):
-            s += '* %s : %s\n' % (k, replaceDerivatives[k])
-        mypage = pywikibot.Page(pywikibot.getSite(), 'User:HRoestTypo/replacedDerivatives')
-        mypage.put_async( s )
-
 
