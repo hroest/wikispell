@@ -17,9 +17,12 @@ from Word import Word, WrongWord
 from AbstractSpellchecker import abstract_Spellchecker
 
 ## pywikibot imports
-import wikipedia as pywikibot
-import pagegenerators
-## pywikibot imports
+try:
+    import wikipedia as pywikibot
+    import pagegenerators
+except ImportError:
+    import pywikibot
+    from pywikibot import pagegenerators
 
 class SpecialTerm(object):
     def __init__(self, text):

@@ -53,9 +53,17 @@ Example usage:
 # Distributed under the terms of the MIT license.
 #
 
-import wikipedia as pywikibot
-import pagegenerators, catlib
 import re, string, sys
+
+## pywikibot imports
+try:
+    import wikipedia as pywikibot
+    import pagegenerators
+    from catlib import Category
+except ImportError:
+    import pywikibot
+    from pywikibot import pagegenerators
+    from pywikibot.page import Category
 
 from wikispell.SpellcheckLib import Word, WrongWord
 from wikispell.SpellcheckLib import readBlacklist
@@ -65,6 +73,7 @@ from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
 import numpy
 
 NUMBER_PAGES = 60
+NUMBER_PAGES = 50
 
 def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
 
@@ -236,7 +245,7 @@ def collectBlacklistPages(batchNr, gen, badDict):
         except pywikibot.IsRedirectPage:
             pywikibot.output(u"%s is a redirect, skip!" % page.title())
             continue
-
+        
         # Process page
         page.words = BlacklistSpellchecker().spellcheck_blacklist(text, badDict, return_words=True)
 
@@ -419,9 +428,6 @@ def main():
         else:
             title.append(arg)
 
-    # This is a purely interactive bot, we therefore do not want to put-throttle
-    pywikibot.put_throttle.setDelay(1)
-
     # Load wordlist
     #  -> this is non-exclusive, e.g. combinations of lists are possible ... 
     wordlist = {}
@@ -582,8 +588,15 @@ def main():
         doSearchWiki(wordlist, blacklistChecker)
         return
     elif recentChanges:
-            s = pagegenerators.RecentchangesPageGenerator(batchNr)
-            gen = pagegenerators.PreloadingGenerator(s, pageNumber=NUMBER_PAGES)
+
+        try:
+            s = pagegenerators.RecentchangesPageGenerator(number=batchNr)
+        except TypeError:
+            # new pywikibot
+            s = pagegenerators.RecentchangesPageGenerator(total=batchNr, namespaces=[0], 
+                    showRedirects=False, _filter_unique=pywikibot.tools.filter_unique)
+
+        gen = pagegenerators.PreloadingGenerator(s, pageNumber=NUMBER_PAGES)
     elif xmlfile:
         if len(title) != 0:
             title = ' '.join(title)
@@ -596,7 +609,7 @@ def main():
 
     elif category:
         print "using cat", category
-        cat = catlib.Category(pywikibot.getSite(), category)
+        cat = Category(pywikibot.getSite(), category)
         gen_ = pagegenerators.CategorizedPageGenerator(cat, recurse=True)
         gen = pagegenerators.PreloadingGenerator(gen_, pageNumber=NUMBER_PAGES)
     elif len(title) != 0:

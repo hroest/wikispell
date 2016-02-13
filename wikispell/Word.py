@@ -10,7 +10,11 @@ A class for storing a wrong word identified during spellcheck
 
 import time, sys
 import re, string
-import wikipedia as pywikibot
+
+try:
+    import wikipedia as pywikibot
+except ImportError:
+    import pywikibot
 
 class Word(object):
 

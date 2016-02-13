@@ -58,12 +58,20 @@ import re, sys
 import string, codecs
 import hunspell, webbrowser
 import pickle
-import wikipedia as pywikibot
-import pagegenerators
 import time
 
-import xmlreader
-import pagegenerators, catlib
+## pywikibot imports
+try:
+    import wikipedia as pywikibot
+    import pagegenerators
+    import xmlreader
+    from catlib import Category
+except ImportError:
+    import pywikibot
+    from pywikibot import pagegenerators
+    from pywikibot import xmlreader
+    from pywikibot.page import Category
+
 
 # from spellcheck import SpecialTerm, distance, getalternatives, cap, uncap
 # from spellcheck import removeHTML, Word, askAlternative
@@ -765,9 +773,6 @@ def main():
             title.append(arg)
             print "title", arg
 
-        # This is a purely interactive bot, we therefore do not want to put-throttle
-        pywikibot.put_throttle.setDelay(1)
-
     if language not in ["DE", "EN"]:
         print "Language needs to be either DE or EN"
         return
@@ -811,14 +816,14 @@ def main():
         gen = [pywikibot.Page(pywikibot.getSite(),title)]
     elif category:
         site = pywikibot.getSite()
-        cat = catlib.Category(site, category)
+        cat = Category(site, category)
         gen = pagegenerators.CategorizedPageGenerator(cat, recurse=True)
     else:
         ####################################
         #Examples
         site = pywikibot.getSite()
-        cat = catlib.Category(site,'Kategorie:Staat in Europa')
-        cat = catlib.Category(site,'Kategorie:Schweizer')
+        cat = Category(site,'Kategorie:Staat in Europa')
+        cat = Category(site,'Kategorie:Schweizer')
         cgen = pagegenerators.CategorizedPageGenerator(cat)
         gen = pagegenerators.PreloadingGenerator(cgen)
 

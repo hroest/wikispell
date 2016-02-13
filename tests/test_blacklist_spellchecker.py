@@ -4,8 +4,12 @@
 """Unit test for blacklist spellchecker
 """
 
-import wikipedia as pywikibot
-#from spellcheck_wordlist import BlacklistSpellchecker
+try:
+    import wikipedia as pywikibot
+except ImportError:
+    import pywikibot
+
+from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
 from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
 import wikispell.textrange_parser as textrange_parser
 
