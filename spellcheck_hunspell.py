@@ -781,9 +781,10 @@ def main():
 
     if True:
         if common_words is not None:
-            f = open(common_words)
-            for l in f:
-                common_words_dict.add(l.strip().decode("utf8").lower())
+            for wordfile in common_words.split(";"):
+                f = open(wordfile)
+                for l in f:
+                    common_words_dict.add(l.strip().decode("utf8").lower())
 
         print "Got %s known good words from the supplied file" % len(common_words_dict)
 
