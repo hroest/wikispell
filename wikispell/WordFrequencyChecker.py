@@ -37,8 +37,9 @@ class WordFrequencyChecker():
     def checkit(self, pages, wrongs, g_correct, spellchecker):
         """
         Takes a list of pages and associated wrong words and goes through them
-        one by one.
+        one by one, asking user input to correct it.
         """
+
         replacedic = self.replace
         noall = self.noall
         replacecount = self.rcount
@@ -177,7 +178,7 @@ class WordFrequencyChecker():
                         occurence_cutoff = 20, lcutoff = 0.8,
                         db_='hroest.countedwords', ldistance = 6):
         """
-        Find candidate misspellings for the input (correct) myw 
+        Find candidate misspellings for the correct input word "myw".
 
         Searches for all words starting with the same 3 characters in
         Wikipedia, then selects candidates among those with a Levenshtein ratio

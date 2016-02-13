@@ -29,22 +29,22 @@ https://raw.githubusercontent.com/hroest/spellcheck-data/master/lists/de/perturb
 
 Example usage:
 
-    spellcheck_wordlist.py -searchWiki -singleword:"Dölli;test"
-    spellcheck_wordlist.py Uttwil -singleword:"goldschmied;test"
-    spellcheck_wordlist.py -xmlfile:/media/data/tmp/wiki/dewiki-latest-pages-articles.xml.bz2 -singleword:"und;test" -batchNr:10
+    python spellcheck_wordlist.py -searchWiki -singleword:"Dölli;test"
+    python spellcheck_wordlist.py Uttwil -singleword:"goldschmied;test"
+    python spellcheck_wordlist.py -xmlfile:/media/data/tmp/wiki/dewiki-latest-pages-articles.xml.bz2 -singleword:"und;test" -batchNr:10
 
-    spellcheck_wordlist.py -blacklist:blacklist.dic -recentchanges
+    python spellcheck_wordlist.py -blacklist:blacklist.dic -recentchanges
 
-    spellcheck_wordlist.py -blacklistpage:User:HRoestTypo/replacedDerivatives -cat:Schweiz
-    spellcheck_wordlist.py -blacklistpage:User:HRoestTypo/replacedDerivatives -searchWiki
+    python spellcheck_wordlist.py -blacklistpage:User:HRoestTypo/replacedDerivatives -cat:Schweiz
+    python spellcheck_wordlist.py -blacklistpage:User:HRoestTypo/replacedDerivatives -searchWiki
 
-    spellcheck_wordlist.py -blacklistpage:User:HRoestTypo/replaced -searchWiki
+    python spellcheck_wordlist.py -blacklistpage:User:HRoestTypo/replaced -searchWiki
 
-    spellcheck_wordlist.py -typopage:Benutzer:HRoestTypo/Tippfehler/20151002/63
+    python spellcheck_wordlist.py -typopage:Benutzer:HRoestTypo/Tippfehler/20151002/63
 
     python spellcheck_wordlist.py -searchWiki -blacklist:concat.dic
 
-    spellcheck_wordlist.py -xmlfile:data/dewiki-latest-pages-articles.xml.bz2 -non-interactive -batchNr:1000 \
+    python spellcheck_wordlist.py -xmlfile:data/dewiki-latest-pages-articles.xml.bz2 -non-interactive -batchNr:1000 \
                                 -pageStore:User:HRoestTypo/Tippfehler/
 
 """
