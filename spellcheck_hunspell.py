@@ -784,6 +784,8 @@ def main():
     if True:
         if common_words is not None:
             for wordfile in common_words.split(";"):
+                if len(wordfile) == 0: 
+                    continue
                 f = open(wordfile)
                 for l in f:
                     common_words_dict.add(l.strip().decode("utf8").lower())
