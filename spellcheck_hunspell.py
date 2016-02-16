@@ -66,11 +66,13 @@ try:
     import pagegenerators
     import xmlreader
     from catlib import Category
+    newBot = False
 except ImportError:
     import pywikibot
     from pywikibot import pagegenerators
     from pywikibot import xmlreader
     from pywikibot.page import Category
+    newBot = True
 
 
 # from spellcheck import SpecialTerm, distance, getalternatives, cap, uncap
@@ -797,9 +799,37 @@ def main():
     sp.correct_html_codes = correct_html_codes
     sp.nosuggestions = nosuggestions
 
-    if start:
+    if start and not category:
         gen = pagegenerators.PreloadingGenerator(
             pagegenerators.AllpagesPageGenerator(start=start,includeredirects=False))
+    elif category:
+        site = pywikibot.getSite()
+        cat = Category(site, category)
+
+        myStart = None
+        if start:
+            myStart = start
+
+        # Going through categories was easier with the old bot...
+        if not newBot:
+            cgen = pagegenerators.CategorizedPageGenerator(cat, start=myStart)
+            gen = pagegenerators.PreloadingGenerator(cgen)
+        else:
+            if not myStart:
+                cgen = pagegenerators.CategorizedPageGenerator(cat)
+            else:
+                # When we want to continue where we left off, we have to select the starting point ourselves:
+                articles = sorted(pagegenerators.CategorizedPageGenerator(cat), key = lambda x: x.title()  )
+                cgen = []
+                skip = True
+                for p in articles:
+                    if p.title() == myStart:
+                        skip = False
+                    if not skip:
+                        cgen.append( p )
+
+            # Preload the pages
+            gen = pagegenerators.PreloadingGenerator(cgen, usePageIds=False)
     elif xmlfile:
         gen = xmlreader.XmlDump(xmlfile).parse()
     elif newpages:
@@ -815,10 +845,6 @@ def main():
     elif len(title) != 0:
         title = ' '.join(title)
         gen = [pywikibot.Page(pywikibot.getSite(),title)]
-    elif category:
-        site = pywikibot.getSite()
-        cat = Category(site, category)
-        gen = pagegenerators.CategorizedPageGenerator(cat, recurse=True)
     else:
         ####################################
         #Examples
