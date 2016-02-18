@@ -169,7 +169,7 @@ class RuleBasedWordAnalyzer():
             return True
 
         if self.language in ["DE", "EN"] and any(char in [u"è", u"ê", u"é", u"ô", u"ò", u"ó", u"á", 
-                                                           u"í"] for char in smallword):
+                                                           u"í", u"ø"] for char in smallword):
             return True
 
         if self.language in ["EN"] and any(char in [u"ö", u"ä", u"ü"] for char in smallword):
@@ -195,6 +195,10 @@ class RuleBasedWordAnalyzer():
                 return True
             if smallword.endswith("ization") and smallword[:-7] in self.common_words:
                 # print "EN can skip composite word", smallword.encode("utf8")
+                return True
+
+        if self.language == "DE":
+            if smallword.startswith("un") and smallword[2:] in self.common_words:
                 return True
 
         if (self.language == "DE" or self.language == "EN") and self.stringent < 60:
