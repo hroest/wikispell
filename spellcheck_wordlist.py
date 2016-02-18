@@ -70,12 +70,14 @@ from wikispell.SpellcheckLib import readBlacklist
 from wikispell.SpellcheckLib import InteractiveWordReplacer
 from wikispell.SpellcheckLib import abstract_Spellchecker
 from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
-import numpy
 
 NUMBER_PAGES = 60
 NUMBER_PAGES = 50
 
 def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
+    """
+    Use the search page generator to go through a wordlist and replace words
+    """
 
     # Simple search and replace ...
     i = 0
@@ -158,6 +160,9 @@ def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
             mypage.put(output,  u'Update' )
 
 def writeTyposToWikipedia(res, page_name):
+    """
+    Output wrong words to a Wiki page
+    """
     output = ""
     for r in res:
         # {{User:HRoestTypo/V/Typo|Johann Heinrich Zedler|Maerialien|Materialien}}
@@ -194,6 +199,9 @@ def writeTyposToWikipedia(res, page_name):
     myIter += 1
 
 def loadPagesWiki(wr, correctWords_page, ignorePages_page):
+    """
+    Load list of correct words and ignored pages
+    """
     # Load correct words
     mypage = pywikibot.Page(pywikibot.getSite(), correctWords_page)
     text = mypage.get()
@@ -221,7 +229,9 @@ def loadPagesWiki(wr, correctWords_page, ignorePages_page):
     wr.ignorePerPages = correctWords
 
 def collectBlacklistPages(batchNr, gen, badDict):
-    """Collect all wrong words in the provided page generator.
+    """
+    Go through all pages in the provided page generator and spellcheck them.
+    Return the pages with words attached.
     """
 
     wrongWords = []
@@ -259,6 +269,9 @@ def collectBlacklistPages(batchNr, gen, badDict):
 
 def processXMLWordlist(xmlfile, badDict, batchNr = 3000, breakUntil = '',
                        doNoninteractive=False, pageStore=None):
+    """
+    Process an XML dump with the given wordlist
+    """
     from SpellcheckLib import InteractiveWordReplacer
     import xmlreader
 
@@ -394,6 +407,7 @@ def main():
     category = None
     xmlfile = None
     typopage = None
+    typofile = None
     pageStore = None
     title = []
     batchNr = 1000
@@ -408,6 +422,8 @@ def main():
             blacklistpage = arg[15:]
         elif arg.startswith("-typopage:"):
             typopage = arg[10:]
+        elif arg.startswith("-typofile:"):
+            typofile = arg[10:]
         elif arg.startswith("-singleword:"):
             singleWord = arg[12:]
         elif arg.startswith("-searchWiki"):
@@ -447,13 +463,21 @@ def main():
             spl =  l.split(' : ')
             wordlist[spl[0].lower()] = spl[1].strip().lower()
 
-    if typopage:
-        mypage = pywikibot.Page(pywikibot.getSite(), typopage)
-        text = mypage.get()
+    if typopage or typofile:
+
+        if typopage:
+            mypage = pywikibot.Page(pywikibot.getSite(), typopage)
+            text = mypage.get()
+        elif typofile:
+            f = open(typofile)
+            text = f.read().decode("utf8")
+            f.close()
+
         pages = {}
         print "Will generate for ", len(text.splitlines()), "words"
 
         # Iterate through page with words to replace
+        MINLEN = 5
         for line in text.splitlines():
             if len(line) > 4:
                 inner = line.strip()[2:-2]
@@ -463,7 +487,7 @@ def main():
                 wrongWord = elem[2]
                 correctWord = elem[3]
 
-                if len(wrongWord) < 5 or len(correctWord) < 5:
+                if len(wrongWord) < MINLEN or len(correctWord) < MINLEN:
                     print "skip", title, ":", wrongWord
                     continue
 
