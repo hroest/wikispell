@@ -181,9 +181,9 @@ class WordFrequencyChecker():
     # 
     def find_candidates(self, myw, cursor, 
                         occurence_cutoff = 20, lcutoff = 0.8,
-                        db_='hroest.countedwords', ldistance = 6):
+                        db_='hroest.countedwords', ldistance = 6, applyFilter=True):
         """
-        Find candidate misspellings for the correct input word "myw".
+        Find candidate misspellings for the input (correct) myw 
 
         Searches for all words starting with the same 3 characters in
         Wikipedia, then selects candidates among those with a Levenshtein ratio
@@ -247,10 +247,15 @@ class WordFrequencyChecker():
 
         # Remove certain candidates 
         candidates = [c for c in candidates if c.find(")") == -1 and c.find("(") == -1 ]
+        candidates = [c for c in candidates if c.decode("utf8").find(u"´") == -1 and 
+                                               c.decode("utf8").find(u"‡") == -1 and
+                                               c.decode("utf8").find(u"”") == -1 and
+                                               c.decode("utf8").find(u"™") == -1 and
+                                               c.decode("utf8").find(u"…") == -1 ]
 
         # 5 Remove candidates that are correctly spelled
         if hspell is not None:
-            candidates = [c for c in candidates if not hspell.spell( c ) ]
+            candidates = [c for c in candidates if not hspell.spell( c )]
 
         # 6 Check for similar things in the database (capitalization)
         final_candidates = []
@@ -271,8 +276,22 @@ class WordFrequencyChecker():
                     final_candidates.append(cand)
 
         print "Removed %s due to high occurence in the word count" % ( len(candidates) - len(final_candidates) )
+        candidates = final_candidates
 
-        # Get unique candidates sorted by distance
+        # 7 Remove possibly correct candidates
+        if applyFilter:
+            if myw.endswith("em") or \
+               myw.endswith("es") or \
+               myw.endswith("er") or \
+               myw.endswith("en"): 
+                    final_candidates = [cand for cand in final_candidates
+                       if myw[-2:] == cand.decode("utf8")[-2:] or 
+                          not (cand.endswith("em") or 
+                               cand.endswith("es") or 
+                               cand.endswith("er") or 
+                               cand.endswith("en") ) ]
+
+        # Get unique candidates sorted by ratio
         final_candidates = list(set(final_candidates))
         final_candidates.sort(lambda x,y: cmp( Levenshtein.ratio(myw,x.decode('utf8')), Levenshtein.ratio(myw,y.decode('utf8')) ) )
         # print "sorted"
