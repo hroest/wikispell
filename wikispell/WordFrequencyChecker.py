@@ -39,15 +39,15 @@ class WordFrequencyChecker():
         if load:
             self.load_wikipedia()
 
-    def checkit(self, pages, wrongs, g_correct, spellchecker):
+    def checkit(self, pages, wrongs, g_correct, spellchecker, interactive=True):
         """
         Takes a list of pages and associated wrong words and goes through them
-        one by one, asking user input to correct it.
+        one by one.
         """
-
         replacedic = self.replace
         noall = self.noall
         replacecount = self.rcount
+        output = ""
 
         for i,page in enumerate(pages):
             wrong = wrongs[i]
@@ -115,14 +115,22 @@ class WordFrequencyChecker():
                         print "    Continue (no change)"
                         continue
 
-            if not replacecount.has_key(mywrong): replacecount[mywrong] = 0
+            if not replacecount.has_key(mywrong): 
+                replacecount[mywrong] = 0
+
+            if not interactive:
+                output += "{{User:HRoestTypo/V/Typo|%s|%s|%s}}\n" % (page.title(), wrong, correct)
+                continue
+
             pywikibot.showDiff(text, newtext)
-            a = self._ask_user_input(page, mywrong, correct, newtext, text)
+            a = self.ask_user_input(page, mywrong, correct, newtext, text)
             if a is not None and a == "x":
                 print "Exit, go to next"
-                return
+                return ""
 
-    def _ask_user_input(self, page, wrong, correct, newtext, text):
+        return output
+
+    def ask_user_input(self, page, wrong, correct, newtext, text):
         """
         Takes a page and a list of words to replace and asks the user for each one
         """
