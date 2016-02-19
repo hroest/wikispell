@@ -15,7 +15,6 @@ import codecs
 # local imports
 from Word import Word, WrongWord
 from AbstractSpellchecker import abstract_Spellchecker
-from InteractiveWordReplacer import InteractiveWordReplacer
 
 ## pywikibot imports
 try:
