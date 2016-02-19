@@ -164,6 +164,7 @@ class WordFrequencyChecker():
                 print "Replace all with "
                 replacement = pywikibot.input('Replace "%s" with?' % wrong)
                 self.replaceNew[ wrong ]  = replacement
+                self.replace[ wrong ]  = replacement ## ensure that we also store the new correction
                 mynewtext = text.replace(wrong, replacement)
                 if mynewtext == text: 
                     return None
