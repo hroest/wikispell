@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 """
-A library of spellchecking helper classes and functions
+A base class for different spellcheckers
 """
 
 #

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 """
-A class for storing a wrong word identified during spellcheck
+A class for performing a spellcheck using a word list
 """
 
 #

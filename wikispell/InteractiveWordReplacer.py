@@ -13,6 +13,7 @@ import time, sys
 # local imports
 from Word import Word
 from AbstractSpellchecker import abstract_Spellchecker
+from Callback import CallbackObject
 
 ## pywikibot imports
 try:
