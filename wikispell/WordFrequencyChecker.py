@@ -18,9 +18,11 @@ import SpellcheckLib
 try:
     import wikipedia as pywikibot
     import pagegenerators
+    newBot = False
 except ImportError:
     import pywikibot
     from pywikibot import pagegenerators
+    newBot = True
 
 hspell = None
 try:
@@ -309,21 +311,28 @@ class WordFrequencyChecker():
 
         return final_candidates
 
-    def _load_candidates(self, correct, candidates):
+    def _load_candidates(self, correct, candidates, max_cand=120):
 
         pages = []
         for i, wrong in enumerate(candidates):
+
             wrong = wrong.decode('utf8')
-            if correct.find(wrong) != -1: continue
-            if wrong in self.noall: continue
-            searchResult = list(pagegenerators.SearchPageGenerator(wrong, namespaces='0'))
+            if correct.find(wrong) != -1: 
+                continue
+            if wrong in self.noall: 
+                continue
+
+            if newBot:
+                searchResult = list(pagegenerators.SearchPageGenerator(wrong, namespaces='0', total=max_cand))
+            else:
+                searchResult = list(pagegenerators.SearchPageGenerator(wrong, namespaces='0'))
 
             print wrong, len(list(searchResult))
-            if len(list(searchResult)) > 90:
+            if len(list(searchResult)) > max_cand:
                 searchResult = list(pagegenerators.SearchPageGenerator("%s" % wrong, namespaces='0'))
                 print "now we have ", len(searchResult), " found"
 
-            if len(list(searchResult)) > 80:
+            if len(list(searchResult)) > max_cand:
                 searchResult = searchResult[:10]
 
             for p in searchResult:
