@@ -294,15 +294,45 @@ class WordFrequencyChecker():
         # Get unique candidates sorted by ratio
         final_candidates = list(set(final_candidates))
         final_candidates.sort(lambda x,y: cmp( Levenshtein.ratio(myw,x.decode('utf8')), Levenshtein.ratio(myw,y.decode('utf8')) ) )
+
+
         # print "sorted"
         # for w in final_candidates:
         #         print w, Levenshtein.distance(myw,w.decode('utf8')) ,  Levenshtein.ratio(myw,w.decode('utf8'))
 
         return final_candidates
 
-    def load_candidates(self, correct, candidates):
-        import spellcheck
+    def _load_candidates(self, correct, candidates):
+
         pages = []
+        for i, wrong in enumerate(candidates):
+            wrong = wrong.decode('utf8')
+            if correct.find(wrong) != -1: continue
+            if wrong in self.noall: continue
+            searchResult = list(pagegenerators.SearchPageGenerator(wrong, namespaces='0'))
+
+            print wrong, len(list(searchResult))
+            if len(list(searchResult)) > 90:
+                searchResult = list(pagegenerators.SearchPageGenerator("%s" % wrong, namespaces='0'))
+                print "now we have ", len(searchResult), " found"
+
+            if len(list(searchResult)) > 80:
+                searchResult = searchResult[:10]
+
+            for p in searchResult:
+                p.wrong = wrong;
+                p.words = [ SpellcheckLib.WrongWord(wrong, bigword=wrong, correctword=correct) ]
+                print "append page", p
+                pages.append(p)
+
+        return pages
+
+
+    def load_candidates(self, correct, candidates, askUser=True):
+
+        if not askUser:
+            return self._load_candidates(correct, candidates)
+
         print "Enter numbers separated with a space" 
         for i, wrong in enumerate(candidates): 
             wrong = wrong.decode('utf8')
@@ -335,26 +365,7 @@ class WordFrequencyChecker():
 
             self.noall.extend(toignore)
 
-        for i, wrong in enumerate(candidates):
-            wrong = wrong.decode('utf8')
-            if correct.find(wrong) != -1: continue
-            if wrong in self.noall: continue
-            searchResult = list(pagegenerators.SearchPageGenerator(wrong, namespaces='0'))
-
-            print wrong, len(list(searchResult))
-            if len(list(searchResult)) > 90:
-                searchResult = list(pagegenerators.SearchPageGenerator("%s" % wrong, namespaces='0'))
-                print "now we have ", len(searchResult), " found"
-
-            if len(list(searchResult)) > 80:
-                searchResult = searchResult[:10]
-
-            for p in searchResult:
-                p.wrong = wrong;
-                p.words = [ SpellcheckLib.WrongWord(wrong, bigword=wrong, correctword=correct) ]
-                print "append page", p
-                pages.append(p)
-        return pages
+        return self._load_candidates(correct, candidates)
 
     #
     ## Load and store dictionary data from Wikipedia
