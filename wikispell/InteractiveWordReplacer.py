@@ -228,7 +228,7 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
 
         self.pm = pm
 
-    def checkit(self, pages, wrongs, g_correct, spellchecker):
+    def checkit(self, pages, wrongs, g_correct):
         """
         Takes a list of pages and associated wrong words and goes through them
         one by one, asking user input to correct it.
@@ -256,7 +256,7 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
                 page = page.getRedirectTarget()
                 text = page.get()
 
-            myranges = spellchecker.forbiddenRanges(text, level="moderate")
+            myranges = self.forbiddenRanges(text, level="moderate")
             r = ranges.Ranges()
             r.ranges = myranges
             ext_r = r.get_large_ranges()
