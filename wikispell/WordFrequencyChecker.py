@@ -10,12 +10,17 @@ Finally use checkit to go through the words.
 """
 
 import re
-import wikipedia
-import textrange_parser as ranges
 
-import wikipedia as pywikibot
-import pagegenerators
+import textrange_parser as ranges
 import SpellcheckLib
+
+## pywikibot imports
+try:
+    import wikipedia as pywikibot
+    import pagegenerators
+except ImportError:
+    import pywikibot
+    from pywikibot import pagegenerators
 
 hspell = None
 try:
@@ -250,7 +255,7 @@ class WordFrequencyChecker():
         # 6 Check for similar things in the database (capitalization)
         final_candidates = []
         for cand in candidates:
-                q = "select occurence, smallword from hroest.countedwords_20151002_n where smallword = '%s';"  % cand
+                q = "select occurence, smallword from %s where smallword = '%s';"  % (db_, cand)
                 try:
                     cursor.execute(q)
                 except Exception:
