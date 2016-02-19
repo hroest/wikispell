@@ -37,7 +37,7 @@ class PermanentWordlist():
         if load:
             self.load_wikipedia()
 
-    def checkIsIgnored(self, title, wrong, correct):
+    def checkIsIgnored(self, title, wrong, correct=None):
         if title is not None:
             if title in self.correctPerPage and wrong in self.correctPerPage[title]:
                 return True
@@ -55,7 +55,12 @@ class PermanentWordlist():
         self.rcount[wrong] = tmp + 1
 
     def markCorrectWord(self, correct):
-        self.noall.append(correct)
+        assert not isinstance(correct, list)
+        self.noall.update( [correct] )
+
+    def markCorrectWords(self, correct):
+        assert isinstance(correct, list)
+        self.noall.update(correct)
 
     def markCorrectWordPerPage(self, page, correct):
         tmp = self.correctPerPage.get( page, [])
