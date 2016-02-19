@@ -237,12 +237,12 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
         for i,page in enumerate(pages):
             wrong = wrongs[i]
             correct = g_correct
-            if wrong in self.pm.replaceNew:
-                correct = self.pm.replaceNew[wrong]
+            if wrong in self.pm.getReplaceDict():
+                correct = self.pm.getReplaceDict()[wrong]
 
             print "Starting work on", page.title(), "word:", wrong
 
-            if wrong.lower() in self.pm.noall:
+            if self.pm.checkIsIgnored(None, wrong.lower()):
                 print "    Continue (word in ignore)"
                 continue
 
@@ -280,7 +280,7 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
                     break
                 newtext = newtext[:found] + cupper + newtext[found+len(wupper):]
 
-            #  -> next look for the lower case version of the word
+            # -> next look for the lower case version of the word
             mywrong = wupper
             if newtext == text: 
                 pos = 0 
@@ -300,9 +300,6 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
                         print "    Continue (no change)"
                         continue
 
-            if not self.pm.rcount.has_key(mywrong): 
-                self.pm.rcount[mywrong] = 0
-
             pywikibot.showDiff(text, newtext)
             a = self._ask_user_input(page, mywrong, correct, newtext, text)
             if a is not None and a == "x":
@@ -321,44 +318,54 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
                ['Yes', 'yes', 'No', 'no', 'Yes to all', 'No to all', 
                 'replace with ...', 'replace always with ...', '<--!sic!-->', "Exit"],
                            ['y', '\\', 'n', ']', 'a', 'noall', 'r', 'ra', 's', 'x'])
+
             if choice == 'noall':
                 print 'no to all'
-                self.pm.noall.update( [ wrong.lower() ] )
+                self.pm.markCorrectWord(wrong.lower() )
                 return None
+
             elif choice in ('y', '\\'):
-                if not self.pm.replace.has_key(wrong) and not correctmark:
-                    self.pm.replace[wrong] = correct
-                if not correctmark: 
-                    self.pm.rcount[wrong] += 1
-                # TODO : return rather than put
+
+                # Check for correctmark (correct a word often written wrongly "sic")
+                if not correctmark:
+                    self.pm.markReplaced(wrong, correct)
+
+                # TODO : return new text rather than put
                 page.put_async(mynewtext, comment=mycomment)
                 return None
+
             elif choice == 's':
                 mynewtext = text.replace(wrong, wrong + '<!--sic!-->')
                 pywikibot.showDiff(text, mynewtext)
                 mycomment = "Korrektschreibweise eines oft falsch geschriebenen Wortes (%s) markiert." % (wrong) 
                 correctmark = True
+
             elif choice == 'r':
                 replacement = pywikibot.input('Replace "%s" with?' % wrong)
                 mynewtext = text.replace(wrong, replacement)
                 if mynewtext == text: 
                     return None
+
                 pywikibot.showDiff(text, mynewtext)
                 mycomment = "Tippfehler entfernt: %s -> %s" % (wrong, replacement) 
+
             elif choice == 'ra': 
                 print "Replace all with "
                 replacement = pywikibot.input('Replace "%s" with?' % wrong)
-                self.pm.replaceNew[ wrong ]  = replacement
+                # TODO we used to have a separate dict for this (replaceNew)
+                self.pm.markReplaced(wrong, correct)
                 mynewtext = text.replace(wrong, replacement)
                 if mynewtext == text: 
                     return None
                 pywikibot.showDiff(text, mynewtext)
                 mycomment = "Tippfehler entfernt: %s -> %s" % (wrong, replacement) 
+
             elif choice in ['n', ']']: 
                 return None
+
             elif choice == 'x': 
                 return "x"
+
             else: 
                 return None
-
 
