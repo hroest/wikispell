@@ -37,6 +37,9 @@ class PermanentWordlist():
         if load:
             self.load_wikipedia()
 
+    def getReplaceDict(self):
+        return self.replace
+
     def checkIsIgnored(self, title, wrong, correct=None):
         if title is not None:
             if title in self.correctPerPage and wrong in self.correctPerPage[title]:
