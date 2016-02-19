@@ -14,6 +14,7 @@ import time, sys
 from Word import Word
 from AbstractSpellchecker import abstract_Spellchecker
 from Callback import CallbackObject
+import textrange_parser as ranges
 
 ## pywikibot imports
 try:
@@ -218,4 +219,146 @@ class InteractiveWordReplacer(abstract_Spellchecker):
             page.typocomment += word.word + " => " + word.replacement
 
         return text
+
+class InteractiveSearchReplacer(abstract_Spellchecker):
+    """ Interactivly replace individual words using search and replace
+    """
+
+    def __init__(self, pm=None):
+
+        self.pm = pm
+
+    def checkit(self, pages, wrongs, g_correct, spellchecker):
+        """
+        Takes a list of pages and associated wrong words and goes through them
+        one by one, asking user input to correct it.
+        """
+
+        for i,page in enumerate(pages):
+            wrong = wrongs[i]
+            correct = g_correct
+            if wrong in self.pm.replaceNew:
+                correct = self.pm.replaceNew[wrong]
+
+            print "Starting work on", page.title(), "word:", wrong
+
+            if wrong.lower() in self.pm.noall:
+                print "    Continue (word in ignore)"
+                continue
+
+            try:
+                text = page.get()
+            except pywikibot.NoPage:
+                pywikibot.output(u"%s doesn't exist, skip!" % page.title())
+                continue
+            except pywikibot.IsRedirectPage:
+                pywikibot.output(u"%s is a redirect, get target!" % page.title())
+                page = page.getRedirectTarget()
+                text = page.get()
+
+            myranges = spellchecker.forbiddenRanges(text, level="moderate")
+            r = ranges.Ranges()
+            r.ranges = myranges
+            ext_r = r.get_large_ranges()
+
+            wupper = wrong[0].upper() + wrong[1:]
+            wlower = wrong[0].lower() + wrong[1:]
+            cupper = correct[0].upper() + correct[1:]
+            clower = correct[0].lower() + correct[1:]
+
+            # Try to find the position to replace the word
+            #  -> first look for the upper case version of the word
+            pos = 0 
+            newtext = text[:]
+            while True:
+                found = newtext.find(wupper, pos)
+                pos += found + 1
+                if found in ext_r and found != -1:
+                    # Skip excluded position
+                    continue
+                if found == -1:
+                    break
+                newtext = newtext[:found] + cupper + newtext[found+len(wupper):]
+
+            #  -> next look for the lower case version of the word
+            mywrong = wupper
+            if newtext == text: 
+                pos = 0 
+                newtext = text[:]
+                while True: 
+                    found = newtext.find( wlower, pos)
+                    pos += found + 1
+                    if found in ext_r and found != -1:
+                        # Skip excluded position
+                        continue
+                    if found == -1:
+                        break
+                    newtext = newtext[:found] + clower + newtext[found+len(wlower):]
+
+                mywrong = wlower
+                if newtext == text:
+                        print "    Continue (no change)"
+                        continue
+
+            if not self.pm.rcount.has_key(mywrong): 
+                self.pm.rcount[mywrong] = 0
+
+            pywikibot.showDiff(text, newtext)
+            a = self._ask_user_input(page, mywrong, correct, newtext, text)
+            if a is not None and a == "x":
+                print "Exit, go to next"
+                return
+
+    def _ask_user_input(self, page, wrong, correct, newtext, text):
+        """
+        Takes a page and a list of words to replace and asks the user for each one
+        """
+        mynewtext = newtext
+        mycomment = "Tippfehler entfernt: %s -> %s" % (wrong, correct) 
+        correctmark = False
+        while True:
+            choice = pywikibot.inputChoice('Commit?', 
+               ['Yes', 'yes', 'No', 'no', 'Yes to all', 'No to all', 
+                'replace with ...', 'replace always with ...', '<--!sic!-->', "Exit"],
+                           ['y', '\\', 'n', ']', 'a', 'noall', 'r', 'ra', 's', 'x'])
+            if choice == 'noall':
+                print 'no to all'
+                self.pm.noall.update( [ wrong.lower() ] )
+                return None
+            elif choice in ('y', '\\'):
+                if not self.pm.replace.has_key(wrong) and not correctmark:
+                    self.pm.replace[wrong] = correct
+                if not correctmark: 
+                    self.pm.rcount[wrong] += 1
+                # TODO : return rather than put
+                page.put_async(mynewtext, comment=mycomment)
+                return None
+            elif choice == 's':
+                mynewtext = text.replace(wrong, wrong + '<!--sic!-->')
+                pywikibot.showDiff(text, mynewtext)
+                mycomment = "Korrektschreibweise eines oft falsch geschriebenen Wortes (%s) markiert." % (wrong) 
+                correctmark = True
+            elif choice == 'r':
+                replacement = pywikibot.input('Replace "%s" with?' % wrong)
+                mynewtext = text.replace(wrong, replacement)
+                if mynewtext == text: 
+                    return None
+                pywikibot.showDiff(text, mynewtext)
+                mycomment = "Tippfehler entfernt: %s -> %s" % (wrong, replacement) 
+            elif choice == 'ra': 
+                print "Replace all with "
+                replacement = pywikibot.input('Replace "%s" with?' % wrong)
+                self.pm.replaceNew[ wrong ]  = replacement
+                mynewtext = text.replace(wrong, replacement)
+                if mynewtext == text: 
+                    return None
+                pywikibot.showDiff(text, mynewtext)
+                mycomment = "Tippfehler entfernt: %s -> %s" % (wrong, replacement) 
+            elif choice in ['n', ']']: 
+                return None
+            elif choice == 'x': 
+                return "x"
+            else: 
+                return None
+
 
