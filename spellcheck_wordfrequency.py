@@ -7,13 +7,19 @@ Script that identifies misspelled words from a SQL table that contains two colum
     - occurence : the word frequency
 
 """ 
+
 import MySQLdb
-
-import pagegenerators
-import wikipedia as pywikibot
-
-from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
 from wikispell.WordFrequencyChecker import WordFrequencyChecker
+from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
+from wikispell.InteractiveWordReplacer import InteractiveSearchReplacer
+from wikispell.PermanentWordlist import PermanentWordlist
+## pywikibot imports
+try:
+    import wikipedia as pywikibot
+    import pagegenerators
+except ImportError:
+    import pywikibot
+    from pywikibot import pagegenerators
 
 ################################################################################
 
@@ -32,14 +38,17 @@ cursor = db.cursor()
 
 cursor.execute(
 """
-select * from wikiwords.countedwords_%s where occurence > %s
+select * from %s where occurence > %s
 and length(smallword) > %s
 order by occurence DESC
-"""  % (db_dump, WORD_MINOCC, WORD_MINLEN))
+"""  % (db_dump, WORD_MINOCC, WORD_MINLEN)
+)
 misspell = cursor.fetchall()
 
-bb = WordFrequencyChecker()
-sp = BlacklistSpellchecker()
+
+pm = PermanentWordlist("User:HRoestTypo", load=True)
+interactive_replacer = InteractiveSearchReplacer(pm=pm)
+freq_checker = WordFrequencyChecker(pm)
 
 try:
     j = -1
@@ -62,20 +71,20 @@ try:
         if len(candidates) == 0: 
             continue
 
-        pages = bb.load_candidates(myw, candidates, askUser=False) 
+        pages = freq_checker.load_candidates(myw, candidates, askUser=False) 
 
         print "will do", len(pages), "pages"
         wrongwordlist = [p.wrong for p in pages]
+
         gen = pagegenerators.PreloadingGenerator(pages)
-        bb.checkit(gen, wrongwordlist, myw, sp)
+        interactive_replacer.checkit(gen, wrongwordlist, myw)
     
 except KeyboardInterrupt:
-    bb.store_wikipedia()
     print "Keyboard interrupt, will exit gracefully"
 except Exception as e:
-    bb.store_wikipedia()
     print "Caught unhandled exception", e
     raise e
 
-bb.store_wikipedia()
+# Finally
+pm.store_wikipedia()
 
