@@ -33,8 +33,8 @@ except Exception:
 
 class WordFrequencyChecker():
 
-    def __init__(self, load=True):
-        self.noall = []
+    def __init__(self, pm):
+        self.pm = pm
 
     #
     ## Find and evaluate Levenshtein candidates
@@ -170,7 +170,7 @@ class WordFrequencyChecker():
             wrong = wrong.decode('utf8')
             if correct.find(wrong) != -1: 
                 continue
-            if wrong in self.noall: 
+            if self.pm.checkIsIgnored(None, wrong):
                 continue
 
             if newBot:
@@ -202,7 +202,7 @@ class WordFrequencyChecker():
         print "Enter numbers separated with a space" 
         for i, wrong in enumerate(candidates): 
             wrong = wrong.decode('utf8')
-            if wrong in self.noall:
+            if self.pm.checkIsIgnored(None, wrong):
                 continue
             if correct.find(wrong) != -1:
                 continue
@@ -243,7 +243,7 @@ class WordFrequencyChecker():
             except ValueError, IndexError:
                 pass
 
-            self.noall.extend(toignore)
+            self.pm.markCorrectWords(toignore)
 
         return self._load_candidates(correct, candidates)
 
