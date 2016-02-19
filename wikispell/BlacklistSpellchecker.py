@@ -10,7 +10,8 @@ A class for performing a spellcheck using a word list
 
 import time, sys
 import re, string
-from SpellcheckLib import abstract_Spellchecker, InteractiveWordReplacer
+from SpellcheckLib import abstract_Spellchecker
+from InteractiveWordReplacer import InteractiveWordReplacer
 from Word import Word, WrongWord
 
 class BlacklistSpellchecker(abstract_Spellchecker):
