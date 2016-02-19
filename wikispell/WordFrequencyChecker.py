@@ -343,6 +343,7 @@ class WordFrequencyChecker():
                 continue
             print i, wrong
         
+        print "Enter * to switch to positive selection" 
         toignore = pywikibot.input('Ignore?')
 
         # Allow early out
@@ -353,7 +354,20 @@ class WordFrequencyChecker():
         if toignore.strip() == "*":
             toignore = pywikibot.input('Select only?')
             try:
-                tmp = [candidates[int(t)] for t in toignore.split(' ') if t != '']
+                select_only = [t for t in toignore.split(' ') if t != '']
+                res = []
+                for sel in select_only:
+                    try:
+                        res.append( int(sel) )
+                    except ValueError:
+                        spl = sel.split("-")
+                        if len(spl) == 2:
+                            print "got split", spl
+                            res.extend( range(int(spl[0]), int(spl[1])+1) )
+
+                print "selected", res
+
+                tmp = [candidates[int(t)] for t in res]
                 candidates = tmp
             except ValueError, IndexError:
                 pass
