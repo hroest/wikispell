@@ -13,6 +13,7 @@ import time, sys
 # local imports
 from Word import Word
 from AbstractSpellchecker import abstract_Spellchecker
+from wikispell.PermanentWordlist import PermanentWordlist
 from Callback import CallbackObject
 import textrange_parser as ranges
 
@@ -33,14 +34,17 @@ class InteractiveWordReplacer(abstract_Spellchecker):
     question.
     """
 
-    def __init__(self, xmldump=None):
+    def __init__(self, xmldump=None, pm=None):
         self.ignorePages = []
-        self.ignorePerPages = {}
-        self.dontReplace = []
 
         self.Callbacks = []
 
-    def processWrongWordsInteractively(self, pages, offline=False):
+        if pm is None:
+            pm = PermanentWordlist(None)
+
+        self.pm = pm
+
+    def processWrongWordsInteractively(self, pages, offline=False, reloadPages=False):
         """This will process pages with wrong words.
 
         It expects a list of pages with words attached to it.
@@ -48,8 +52,10 @@ class InteractiveWordReplacer(abstract_Spellchecker):
 
         self.performReplacementList = []
         ask = True
-        gen = pagegenerators.PreloadingGenerator(pages)
-        for page in gen:
+        if reloadPages:
+            pages = pagegenerators.PreloadingGenerator(pages)
+
+        for page in pages:
             print('Processing Page = %s'% page.title() )
             thisReplace = []
             try:
@@ -65,28 +71,25 @@ class InteractiveWordReplacer(abstract_Spellchecker):
                 text = page.get()
 
             text = page.get()
-            self.dontReplace = self._checkSpellingInteractive(page, self.dontReplace)
+            self._checkSpellingInteractive(page)
             newtext = self._doReplacement(text, page)
 
             if text == newtext: 
                 continue
 
             pywikibot.showDiff(text, newtext)
-            if ask: choice = pywikibot.inputChoice('Commit?',
-               ['Yes', 'yes', 'No', 'Yes to all'], ['y', '\\', 'n','a'])
-            else: choice = 'y'
-            #if choice == 'a': stillAsk=False; choice = 'y'
+            choice = pywikibot.inputChoice('Commit?', ['Yes', 'yes', 'No', 'no'], ['y', '\\', 'n', ']'])
+
             if choice in ('y', '\\'):
                 callb = CallbackObject()
                 self.Callbacks.append(callb)
                 page.put_async(newtext, comment=page.typocomment, callback=callb)
 
-    def _checkSpellingInteractive(self, page, dontReplace):
+    def _checkSpellingInteractive(self, page):
         """Interactively goes through all wrong words in a page.
 
         All we do here is save doReplace = True if we want to replace it, while
         doReplace will do the actual replacement.
-        Uses self.ignorePerPages and a local dontReplace
         """
 
         title = page.title()
@@ -100,14 +103,7 @@ class InteractiveWordReplacer(abstract_Spellchecker):
             smallword = w.word
 
             # Check if on ignore list -> continue
-            if self.ignorePerPages.has_key(title) \
-               and smallword in self.ignorePerPages[title]: 
-                continue
-            if smallword in dontReplace:
-                if self.ignorePerPages.has_key( title ):
-                    self.ignorePerPages[title].append( smallword)
-                else: 
-                    self.ignorePerPages[ title ] = [ smallword ]
+            if self.pm.checkIsIgnored(title, smallword):
                 continue
 
             bigword = Word(w.bigword)
@@ -152,27 +148,23 @@ class InteractiveWordReplacer(abstract_Spellchecker):
             if choice == 'b':
                 continue
             if choice in ('v'): 
-                dontReplace.append(w.word) 
-                if self.ignorePerPages.has_key( title ):
-                    self.ignorePerPages[title].append( smallword)
-                else: self.ignorePerPages[ title ] = [ smallword ]
+                self.pm.markCorrectWord(smallword)
+                continue
             if choice in ('n', ']'): 
-                if self.ignorePerPages.has_key( title ):
-                    self.ignorePerPages[title].append( smallword)
-                else: self.ignorePerPages[ title ] = [ smallword ]
+                self.pm.markCorrectWordPerPage(title, smallword)
                 continue
             if choice == 'x': 
-                self.ignorePages.append( title );
-                return dontReplace
+                return
             if choice == 'r':
                 w.replacement = pywikibot.input(u"What should I replace \"%s\" by?"
                                               % bigword.word)
                 w.doReplace = True
+
             if choice in ( 'y','\\'):
                 w.replacement = bigword.replace(sugg)
                 w.doReplace = True
 
-        return dontReplace
+                self.pm.markReplaced(smallword, sugg)
 
     def _doReplacement(self, text, page, ask = True):
         """This will perform the replacement for one page and return the text.
