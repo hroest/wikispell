@@ -29,37 +29,45 @@ class abstract_Spellchecker(object):
         """ Identify ranges where we do not want to spellcheck.
 
         These ranges include templates, wiki links, tables etc
+
+        level =  [none, relaxed, fast, wiki-skip, full]
         """
 
+        if level == "none":
+            return []
+
+        st = time.time()
         ran = []
         albr = ['</ref', '\n', '}}'] # alternative breaks
         extrabr = ['"', "'", u'\u201d', u'\u201c'] # extra breaks
 
         ran.extend(findRange('{{', '}}', text)[0] )      #templates
         ran.extend(findRange('[[', ']]', text)[0] )      #wiki links
+        ran.extend(findRange('<!--', '-->', text)[0] )   #comments
 
         ran.extend(findRange(u'{|', u'|}', text)[0] )    #tables
 
         # Quotation marks
         # See https://de.wikipedia.org/wiki/Anf%C3%BChrungszeichen#Kodierung
 
-        # Simple quotation marks
-        ran.extend(findRange('\"', '\"', text,
-            alternativeBreak = albr + extrabr)[0] )
+        if level in ["full"]:
+            # Simple quotation marks
+            ran.extend(findRange('\"', '\"', text,
+                alternativeBreak = albr + extrabr)[0] )
 
-        # French quotation marks
-        ran.extend(findRange(u'«', u'»', text,
-            alternativeBreak = albr)[0] )
+            # French quotation marks
+            ran.extend(findRange(u'«', u'»', text,
+                alternativeBreak = albr)[0] )
 
-        # Double quotation marks German: „“ ->  \u201e and \u201c
-        ran.extend(findRange(u'\u201e', u'\u201c', text,
-            alternativeBreak = albr + extrabr)[0] )
+            # Double quotation marks German: „“ ->  \u201e and \u201c
+            ran.extend(findRange(u'\u201e', u'\u201c', text,
+                alternativeBreak = albr + extrabr)[0] )
 
-        #  -> also do the above without the extra breaks as to not abort early
-        ran.extend(findRange(u'\u201e', u'\u201c', text,
-             alternativeBreak = albr)[0] )
-        ran.extend(findRange('\"', '\"', text,
-            alternativeBreak = albr)[0] )
+            #  -> also do the above without the extra breaks as to not abort early
+            ran.extend(findRange(u'\u201e', u'\u201c', text,
+                 alternativeBreak = albr)[0] )
+            ran.extend(findRange('\"', '\"', text,
+                alternativeBreak = albr)[0] )
 
         ran.extend(findRange('\'\'', '\'\'', text,
             alternativeBreak = albr)[0] )                #italic
@@ -67,16 +75,15 @@ class abstract_Spellchecker(object):
         ran.extend(findRange('\'\'\'', '\'\'\'', text,
             alternativeBreak = albr)[0] )                #bold
 
-        ran.extend(findRange('<!--', '-->', text)[0] )   #comments
-
         # Regex-based ranges ... 
         ran.extend( textrange_parser.hyperlink_range(text) )
         #ran.extend( textrange_parser.picture_range(text) )       #everything except caption
         ran.extend( textrange_parser.regularTag_range(text) )     #all tags specified
         ran.extend( textrange_parser.sic_comment_range(text) )    #<!--sic-->
 
-        if level == "full":
+        if level in ["full", "wiki-skip"]:
             ran.extend( textrange_parser.references_range(text) )     #all reftags
+        if level == "full":
             ran.extend( textrange_parser.list_ranges(text) )          # lists
 
         # Remove trailing text at the end (references, weblinks etc)
