@@ -34,7 +34,7 @@ class PermanentWordlist():
 
         self.prefix = prefix 
 
-        if load:
+        if prefix is not None and load:
             self.load_wikipedia()
 
     def getReplaceDict(self):
