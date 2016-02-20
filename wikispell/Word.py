@@ -163,3 +163,9 @@ class WrongWord(Word):
 
         Word.__init__(self, wrong_word)
 
+    def getWrongWord(self):
+        return self.word
+    
+    def getCorrectWord(self):
+        return self.correctword
+
