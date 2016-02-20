@@ -30,6 +30,13 @@ class RuleBasedWordAnalyzer():
         #  incorrect but also makes it much faster since the feature
         #  hunspell.suggest takes most time (~6x speedup).
 
+        #
+        #  () - if it contains a number
+        #
+        if any(char.isdigit() for char in smallword) or \
+           any(char in [")", "("] for char in smallword):
+            return True
+
         if self.stringent > 1000:
             return False
 
@@ -62,13 +69,6 @@ class RuleBasedWordAnalyzer():
         #
         if text.count(smallword) > self.multiple_occurence_tol:
             # print "found word", smallword.encode("utf8"), "multiple times:", text.count(smallword)
-            return True
-
-        #
-        #  (e) - if it contains a number
-        #
-        if any(char.isdigit() for char in smallword) or \
-           any(char in [")", "("] for char in smallword):
             return True
 
         #
@@ -110,13 +110,14 @@ class RuleBasedWordAnalyzer():
         #
         if self.language == "EN":
             if smallword.startswith("de") and smallword[2:] in self.common_words:
-                # print "EN can skip composite word", smallword.encode("utf8")
                 return True
             if smallword.startswith("re") and smallword[2:] in self.common_words:
-                # print "EN can skip composite word", smallword.encode("utf8")
                 return True
             if smallword.endswith("ization") and smallword[:-7] in self.common_words:
-                # print "EN can skip composite word", smallword.encode("utf8")
+                return True
+            if smallword.endswith("ly") and smallword[:-2] in self.common_words:
+                return True
+            if smallword.endswith("ee") and smallword[:-2] in self.common_words:
                 return True
 
         if self.language == "DE":
