@@ -52,6 +52,7 @@ class Word(object):
         #replace all occurencs of &nbsp;
         shortword = shortword.replace('&nbsp;', ' ')
         shortword = shortword.replace('nbsp;', ' ')
+        shortword = shortword.replace(u'\xa0', ' ')
         # Remove non-alphanumerical characters at the start
         try:
             while shortword[0] in string.punctuation + u'«»–−→“„‚‘’':
