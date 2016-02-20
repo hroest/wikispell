@@ -86,6 +86,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
     def __init__(self, hunspell_dict, minimal_word_size = 3, 
                  multiple_occurence_tol = 1, nosuggestions=False, 
                  language="DE", stringent = 0, composite_minlen = 0, 
+                 remove_dissimilar = True,
                  common_words = set([])):
 
         self._nosuggestions = nosuggestions
@@ -100,6 +101,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
 
         self._replaceBy = {}
         self.stringent = stringent
+        self.remove_dissimilar = remove_dissimilar
 
         self._wordAnalyzer = RuleBasedWordAnalyzer(minimal_word_size, multiple_occurence_tol, language, stringent, common_words, composite_minlen)
 
@@ -390,7 +392,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
 
                     lratio = Levenshtein.ratio(bigword.correctword, smallword)
                     ldist = Levenshtein.distance(bigword.correctword, smallword)
-                    if lratio < 0.7 or ldist > 5:
+                    if self.remove_dissimilar and (lratio < 0.7 or ldist > 5):
                         return
 
                 except ImportError:
