@@ -31,16 +31,22 @@ class RuleBasedWordAnalyzer():
         #  hunspell.suggest takes most time (~6x speedup).
 
         #
-        #  () - if it contains a number
+        #  (a) - if it contains a number
         #
         if any(char.isdigit() for char in smallword) or \
            any(char in [")", "("] for char in smallword):
             return True
 
+        #
+        #  (b) - we check whether it is following an internal link like [[th]]is
+        #
+        if loc > 2 and text[loc-2:loc] == ']]':
+            return True
+
         if self.stringent > 1000:
             return False
 
-        #  (a) - Remove common words and words that we found more than once
+        #  (c) - Remove common words and words that we found more than once
         #
         if smallword.lower() in self.common_words:
             return True
@@ -50,7 +56,7 @@ class RuleBasedWordAnalyzer():
             return True
         
         #
-        #  (b) - we check whether it is less than n characters long
+        #  (d) - we check whether it is less than n characters long
         #
         if len(smallword) < self.minimal_word_size:
             return True
@@ -59,13 +65,7 @@ class RuleBasedWordAnalyzer():
             return False
 
         #
-        #  (c) - we check whether it is following an internal link like [[th]]is
-        #
-        if loc > 2 and text[loc-2:loc] == ']]':
-            return True
-
-        #
-        #  (d) - skip if the word occurs more than n times in the text
+        #  (e) - skip if the word occurs more than n times in the text
         #
         if text.count(smallword) > self.multiple_occurence_tol:
             # print "found word", smallword.encode("utf8"), "multiple times:", text.count(smallword)
