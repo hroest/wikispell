@@ -97,7 +97,13 @@ class abstract_Spellchecker(object):
             mm = re.search("==\s*Einzelnachweise\s*==", text)
             if mm: ran.append( [mm.start(), len(text)] )
 
-            mm = re.search("\[\[Kategorie:", text)
+            mm = re.search("==\s*References\s*==", text)
+            if mm: ran.append( [mm.start(), len(text)] )
+ 
+            mm = re.search("==\s*Further reading\s*==", text)
+            if mm: ran.append( [mm.start(), len(text)] )
+ 
+            mm = re.search("==\s*External links\s*==", text)
             if mm: ran.append( [mm.start(), len(text)] )
 
         if removeNested:
