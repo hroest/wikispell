@@ -214,7 +214,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
         else:
             return text
 
-    def spellcheck(self, text, forceAlternative=True):
+    def spellcheck(self, text, forceAlternative=True, level="full"):
         """Uses hunspell to replace wrongly written words in a given text.
 
         Returns the corrected text.
@@ -226,7 +226,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
         loc = 0
 
         # Get ranges
-        ranges = self.forbiddenRanges(text)
+        ranges = self.forbiddenRanges(text, level=level)
         ranges = sorted(ranges)
         curr_r = 0
 
