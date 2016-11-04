@@ -60,7 +60,7 @@ import hunspell, webbrowser
 import pickle
 import time
 
-## pywikibot imports
+# Importing pywikibot
 try:
     import wikipedia as pywikibot
     import pagegenerators
@@ -74,9 +74,9 @@ except ImportError:
     from pywikibot.page import Category
     newBot = True
 
-from wikispell.SpellcheckLib import CallbackObject
+from wikispell.Callback import CallbackObject
 from wikispell.SpellcheckLib import askAlternative
-from wikispell.SpellcheckLib import InteractiveWordReplacer
+from wikispell.InteractiveWordReplacer import InteractiveWordReplacer
 from wikispell.HunspellSpellchecker import HunspellSpellchecker
 
 def run_bot(allPages, sp, pageStore=None):

@@ -67,8 +67,8 @@ except ImportError:
 
 from wikispell.SpellcheckLib import Word, WrongWord
 from wikispell.SpellcheckLib import readBlacklist
-from wikispell.SpellcheckLib import InteractiveWordReplacer
 from wikispell.SpellcheckLib import abstract_Spellchecker
+from wikispell.InteractiveWordReplacer import InteractiveWordReplacer
 from wikispell.BlacklistSpellchecker import BlacklistSpellchecker
 
 NUMBER_PAGES = 60
