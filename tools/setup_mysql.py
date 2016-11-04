@@ -60,9 +60,9 @@ Next, execute these commands:
 
 drop table hroest.countedwords_%(dump)s;
 create table countedwords_%(dump)s as
-select count(*)  as occurence, smallword as word from
+select count(*)  as occurrence, smallword as word from
 all_words_%(dump)s group by smallword;
-alter table hroest.countedwords_%(dump)s add index(occurence);
+alter table hroest.countedwords_%(dump)s add index(occurrence);
 alter table hroest.countedwords_%(dump)s add index(word);
 
 """ 

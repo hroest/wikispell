@@ -79,12 +79,14 @@ class HunspellSpellchecker(abstract_Spellchecker):
 
     There are a few parameters:
         - the minimal word size to be still checked (minimal_word_size)
-        - the tolerance for multiple occurrences in the text word (if the word occurs more than multiple_occurence_tol times, it is considered correct)
+        - the tolerance for multiple occurrences in the text word (if the word
+          occurs more than multiple_occurrence_tol times, it is considered
+          correct)
         - whether to use the "suggestions" feature of hunspell 
     """
 
     def __init__(self, hunspell_dict, minimal_word_size = 3, 
-                 multiple_occurence_tol = 1, nosuggestions=False, 
+                 multiple_occurrence_tol = 1, nosuggestions=False, 
                  language="DE", stringent = 0, composite_minlen = 0, 
                  remove_dissimilar = True,
                  common_words = set([])):
@@ -104,7 +106,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
         self.remove_dissimilar = remove_dissimilar
 
         self._wordAnalyzer = RuleBasedWordAnalyzer(minimal_word_size,
-                                                   multiple_occurence_tol,
+                                                   multiple_occurrence_tol,
                                                    language,
                                                    stringent,
                                                    common_words,

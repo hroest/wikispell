@@ -55,15 +55,15 @@ db.autocommit(True)
 cursor = db.cursor()
 
 cursor.execute( """create table %s (
-    occurence int,
+    occurrence int,
     smallword varchar(255)
 ) ENGINE = MYISAM; """ % table)
 
 insert_table = "insert into %s" % table
 for k,v in res.iteritems():
-    tmp = cursor.execute( insert_table + " (occurence, smallword) values (%s,%s)", (v,k) )
+    tmp = cursor.execute( insert_table + " (occurrence, smallword) values (%s,%s)", (v,k) )
 
 
-cursor.execute( """alter table %s add index(occurence) """ % table)
+cursor.execute( """alter table %s add index(occurrence) """ % table)
 cursor.execute( """alter table %s add index(smallword) """ % table)
 

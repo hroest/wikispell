@@ -13,11 +13,11 @@ import time
 
 class RuleBasedWordAnalyzer():
 
-    def __init__(self, minimal_word_size, multiple_occurence_tol, language,
+    def __init__(self, minimal_word_size, multiple_occurrence_tol, language,
                  stringent, common_words, composite_minlen):
 
         self.minimal_word_size = minimal_word_size
-        self.multiple_occurence_tol = multiple_occurence_tol
+        self.multiple_occurrence_tol = multiple_occurrence_tol
         self.language = language
         self.common_words = common_words
         self.composite_minlen = composite_minlen
@@ -67,7 +67,7 @@ class RuleBasedWordAnalyzer():
         #
         #  (e) - skip if the word occurs more than n times in the text
         #
-        if text.count(smallword) > self.multiple_occurence_tol:
+        if text.count(smallword) > self.multiple_occurrence_tol:
             # print "found word", smallword.encode("utf8"), "multiple times:", text.count(smallword)
             return True
 

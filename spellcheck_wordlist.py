@@ -536,15 +536,15 @@ def main():
 
             if len(wDict) == 1:
                 wrong = page.words[0][0]
-                occurence = text.count(wrong)
+                occurrence = text.count(wrong)
 
                 rstr = r'\b%s\b' % (wrong)
                 match = [m.group(0) for m in re.finditer(rstr, text)]
-                occurence = len(match)
+                occurrence = len(match)
 
                 # Exit if the word is common in the page
-                print "Wrong word", wrong, "Occurence", occurence, " (vs %s)" % text.count(wrong)
-                if occurence > 1:
+                print "Wrong word", wrong, "Occurrence", occurrence, " (vs %s)" % text.count(wrong)
+                if occurrence > 1:
                     continue
 
                 in_enum = False

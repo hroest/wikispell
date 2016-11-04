@@ -16,8 +16,8 @@ The main methods are:
                  position contained in the ignore_in argument.
                  The function returns an object of type Ranges.
 
-    find_next_unignored : The function finds the next occurence of pattern in
-                 the given text, ignoring all occurences at positions indicated 
+    find_next_unignored : The function finds the next occurrence of pattern in
+                 the given text, ignoring all occurrences at positions indicated 
                  with ignores (a list of integers).
 
     split_with_ignores : Basically a text.split( separator ) method with the 
@@ -141,7 +141,7 @@ def findRange(opening, closing, text, start=0, alternativeBreak = None,
     return ranges
 
 def find_next_unignored( text, start, pattern, ignores=[]):
-    """Find the next occurence of pattern starting from start, excluding all
+    """Find the next occurrence of pattern starting from start, excluding all
     positions given in ignores. If none is found, it returns -1."""
 
     next_match = text.find( pattern, start )
@@ -301,7 +301,7 @@ def references_range(text):
 def hyperlink_range(text):
     tRange =  [];
     loc = 0
-    # Find all occurences of http(s)// and then append everything except spaces
+    # Find all occurrences of http(s)// and then append everything except spaces
     # or newlines.
     while True:
         s = text.find('https://', loc)

@@ -40,19 +40,19 @@ class WordFrequencyChecker():
     ## Find and evaluate Levenshtein candidates
     # 
     def find_candidates(self, myw, cursor, 
-                        occurence_cutoff = 20, lcutoff = 0.8,
+                        occurrence_cutoff = 20, lcutoff = 0.8,
                         db_='hroest.countedwords', ldistance = 6, applyFilter=True):
         """
         Find candidate misspellings for the input (correct) myw 
 
-        occurence_cutoff : consider all words above this cutoff as correct
+        occurrence_cutoff : consider all words above this cutoff as correct
         lcutoff : Only consider candidates that are above this Levenshtein ratio
         ldistance : Only consider candidates that are below this Levenshtein distance
 
         Searches for all words starting with the same 3 characters in
         Wikipedia, then selects candidates among those with a Levenshtein ratio
         of less than the given cutoff. Also the word occur less than
-        occurence_cutoff to be considered a candidate.
+        occurrence_cutoff to be considered a candidate.
         """
 
         import Levenshtein
@@ -67,9 +67,9 @@ class WordFrequencyChecker():
         select * from %s where smallword like '%s'
         #and length(smallword) between %s and %s
         and smallword not like '%s'
-        and occurence < %s
+        and occurrence < %s
         order by smallword
-        """ % (db_, sterm.encode('utf8')+'%', l-2, l+2, myw.encode('utf8')+'%' , occurence_cutoff))
+        """ % (db_, sterm.encode('utf8')+'%', l-2, l+2, myw.encode('utf8')+'%' , occurrence_cutoff))
         similar = cursor.fetchall()
 
         # 2 Select candidates that have a Levenshtein ratio less than the cutoff
@@ -85,9 +85,9 @@ class WordFrequencyChecker():
                 select * from %s where smallword like '%s' 
                 #and length(smallword) between %s and %s
                 and smallword not like '%s'
-                and occurence < %s
+                and occurrence < %s
                 order by smallword 
-                """ % (db_, sterm.encode('utf8'), l-2, l+2, myw.encode('utf8')+'%', occurence_cutoff) )
+                """ % (db_, sterm.encode('utf8'), l-2, l+2, myw.encode('utf8')+'%', occurrence_cutoff) )
                 similar = cursor.fetchall()
 
                 
@@ -98,9 +98,9 @@ class WordFrequencyChecker():
         select * from %s where smallword like '%s' 
         #and length(smallword) between %s and %s
         and smallword not like '%s'
-        and occurence < %s
+        and occurrence < %s
         order by smallword 
-        """ % (db_, sterm.encode('utf8')+'%', l-2, l+2, myw.encode('utf8')+'%', occurence_cutoff) )
+        """ % (db_, sterm.encode('utf8')+'%', l-2, l+2, myw.encode('utf8')+'%', occurrence_cutoff) )
         similar = cursor.fetchall()
 
         # 4 Select candidates that have a Levenshtein ratio less than the cutoff
@@ -124,7 +124,7 @@ class WordFrequencyChecker():
         # 6 Check for similar things in the database (capitalization)
         final_candidates = []
         for cand in candidates:
-                q = "select occurence, smallword from %s where smallword = '%s';"  % (db_, cand)
+                q = "select occurrence, smallword from %s where smallword = '%s';"  % (db_, cand)
                 try:
                     cursor.execute(q)
                 except Exception:
@@ -136,10 +136,10 @@ class WordFrequencyChecker():
                         if res[0] > nr:
                             nr = res[0]
                 # print "check ", cand, nr
-                if nr < occurence_cutoff:
+                if nr < occurrence_cutoff:
                     final_candidates.append(cand)
 
-        print "Removed %s due to high occurence in the word count" % ( len(candidates) - len(final_candidates) )
+        print "Removed %s due to high occurrence in the word count" % ( len(candidates) - len(final_candidates) )
         candidates = final_candidates
 
         # 7 Remove possibly correct candidates

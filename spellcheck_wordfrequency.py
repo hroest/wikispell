@@ -6,7 +6,7 @@ columns (this table may be generated from an XML dump using the script
 setup_mysql_in_memory.py) :
 
     - smallword : the word itself
-    - occurence : the word frequency
+    - occurrence : the word frequency
 
 This script then iterate through the most common words and tries to identify
 similar words that occur with very low frequency and are thus likely
@@ -82,10 +82,10 @@ cursor = db.cursor()
 
 cursor.execute(
 """
-select * from %s where occurence > %s
+select * from %s where occurrence > %s
 and length(smallword) > %s
 and length(smallword) <= %s
-order by occurence DESC
+order by occurrence DESC
 """  % (args.db, args.occurrence_cutoff, args.lower_cutoff, args.upper_cutoff)
 )
 misspell = cursor.fetchall()
@@ -122,7 +122,7 @@ try:
         print myw, j, "out of", len(misspell)
 
         candidates = freq_checker.find_candidates(myw, cursor,
-                                occurence_cutoff = args.candidate_cutoff,
+                                occurrence_cutoff = args.candidate_cutoff,
                                 lcutoff = args.min_lratio,
                                 ldistance = args.max_ldistance,
                                 db_=args.db)
