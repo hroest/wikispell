@@ -45,9 +45,9 @@ wget http://pyhunspell.googlecode.com/files/hunspell-0.1.tar.gz
 tar xzvf hunspell-0.1.tar.gz; cd hunspell-0.1/
 sudo python setup.py install
 
-# then you need to install the dictionaries in your language: 
-sudo apt-get install hunspell-de-de-frami 
-sudo apt-get install hunspell-de-ch-frami 
+# then you need to install the dictionaries in your language:
+sudo apt-get install hunspell-de-de-frami
+sudo apt-get install hunspell-de-ch-frami
 
 """
 #
@@ -79,7 +79,7 @@ from wikispell.SpellcheckLib import askAlternative
 from wikispell.InteractiveWordReplacer import InteractiveWordReplacer
 from wikispell.HunspellSpellchecker import HunspellSpellchecker
 
-def run_bot(allPages, sp, pageStore=None):
+def run_bot(allPages, sp, pageStore=None, level="full"):
     Callbacks = []
     stillSkip  = False;
     firstPage = True
@@ -124,7 +124,7 @@ def run_bot(allPages, sp, pageStore=None):
         st = time.time()
         orig_text = text
 
-        text, wrongWords = sp.spellcheck(text)
+        text, wrongWords = sp.spellcheck(text, level=level)
 
         if not nonInteractive:
             text = sp.askUser(text, page_title)
@@ -139,8 +139,8 @@ def run_bot(allPages, sp, pageStore=None):
                 update_nr += 1
                 output = ""
 
-            # skip pages without wrong words ... 
-            if len(wrongWords) == 0: 
+            # skip pages without wrong words ...
+            if len(wrongWords) == 0:
                 sp.clearCache()
                 continue
 
@@ -159,7 +159,7 @@ def run_bot(allPages, sp, pageStore=None):
                     continue
                 if wrong.lower() == correct.lower():
                     continue
-                
+
                 if wrong[0].lower() != wrong[0] and len(correct) > 0:
                     # upper case
                     correct = correct[0].upper() + correct[1:]
@@ -200,10 +200,12 @@ def main():
     dictionary = None
     common_words = None
     nosuggestions = False
+    remove_dissimilar = True
     pageStore = None
     correct_html_codes = False
     xmlfile = False
     language = "DE"
+    level="full"
     stringent = 0
     composite_minlen = 0
     for arg in pywikibot.handleArgs():
@@ -215,6 +217,10 @@ def main():
             xmlfile = arg[9:]
         elif arg.startswith("-cat:"):
             category = arg[5:]
+        elif arg.startswith("-keepDissimilar"):
+            remove_dissimilar = False
+        elif arg.startswith("-excludeText:"):
+            level = arg[13:]
         elif arg.startswith("-dictionary:"):
             dictionary = arg[12:]
         elif arg.startswith("-newpages"):
@@ -225,7 +231,7 @@ def main():
             longpages = True
         elif arg.startswith("-minlen:"):
             composite_minlen = int(arg[8:])
-            print "minlen", composite_minlen 
+            print "minlen", composite_minlen
         elif arg.startswith("-nosugg"):
             nosuggestions = True
         elif arg.startswith("-language"):
@@ -250,7 +256,7 @@ def main():
     if True:
         if common_words is not None:
             for wordfile in common_words.split(";"):
-                if len(wordfile) == 0: 
+                if len(wordfile) == 0:
                     continue
                 f = open(wordfile)
                 for l in f:
@@ -259,11 +265,13 @@ def main():
         print "Got %s known good words from the supplied file" % len(common_words_dict)
 
     sp = HunspellSpellchecker(hunspell_dict = dictionary,
+                              minimal_word_size=4,
                               nosuggestions = nosuggestions,
-                              minimal_word_size=4, 
-                              common_words=common_words_dict,  
+                              language = language,
+                              stringent = stringent
                               composite_minlen = composite_minlen,
-                              language = language, stringent = stringent)
+                              remove_dissimilar=remove_dissimilar,
+                              common_words=common_words_dict)
     sp.correct_html_codes = correct_html_codes
     sp.nosuggestions = nosuggestions
 
@@ -322,7 +330,7 @@ def main():
         cgen = pagegenerators.CategorizedPageGenerator(cat)
         gen = pagegenerators.PreloadingGenerator(cgen)
 
-    run_bot(gen, sp, pageStore=pageStore)
+    run_bot(gen, sp, pageStore=pageStore, level=level)
 
 if __name__ == "__main__":
     try:
