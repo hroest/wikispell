@@ -177,15 +177,25 @@ class SpellcheckWordParse(unittest.TestCase):
 
         mypage = pywikibot.Page(pywikibot.getSite(), 'Unterschrift')
         text = mypage.getOldVersion(128568384)
-        result = self.sp.spellcheck_blacklist(text, {'positiver' : 'wrong'}, return_for_db=True)
-        assert len(result) == 1892, len(result)
 
-        result = self.sp.spellcheck_blacklist(text, {'positiver' : 'wrong'}, return_for_db=True, range_level="full")
+        result = self.sp.spellcheck_blacklist(text, {'positiver' : 'wrong'},
+                        return_for_db=True, range_level="none")
+        assert len(result) == 2478, len(result)
+
+        result = self.sp.spellcheck_blacklist(text, {'positiver' : 'wrong'},
+                            return_for_db=True, range_level="full")
         assert len(result) == 1666, len(result)
 
-        result = self.sp.spellcheck_blacklist(getTestCasePietismus(), {'positiver' : 'wrong'}, return_for_db=True)
-        assert len(result) == 27, len(result)
-        assert result == [u'Als', u'positive', u'Selbstbezeichnung', u'hat', u'erstmals', u'der', u'pietistische', u'Leipziger', u'Professor', u'das', u'Wort', u'verwendet', u'poem', u'Oktober', u'folgte', u'Fellers', u'Bekenntnis', u'dem', u'Sonett', u'auf', u'den', u'verstorbenen', u'Leipziger', u'Kaufmann', u'Joachim', u'G\xf6ring', u'poem']
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="full")
+        assert len(result) == 27
+        assert result == [u'Als', u'positive', u'Selbstbezeichnung', u'hat', u'erstmals', u'der', u'pietistische', u'Leipziger', u'Professor', u'das', u'Wort', u'verwendet', u'poem', u'Oktober', u'folgte', u'Fellers', u'Bekenntnis', u'dem', u'Sonett', u'auf', u'den', u'verstorbenen', u'Leipziger', u'Kaufmann', u'Joachim', u'G\xf6ring', u'poem'], result
+
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="moderate")
+        assert len(result) == 28, len(result)
 
 
 
@@ -281,11 +291,23 @@ class SpellcheckBlacklistTestCase(unittest.TestCase):
         # Image names should not trigger a wrong message
         result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), {'deuschland' : 'wrong'})
         assert len(result) == 0
+
         # Quoted text should not trigger a wrong message
-        result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), {'parity' : 'wrong'})
+        result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), 
+                            {'parity' : 'wrong'}, range_level="full")
         assert len(result) == 0
-        result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), {'grid' : 'wrong'})
+        result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), 
+                            {'grid' : 'wrong'}, range_level="full")
         assert len(result) == 0
+
+        # However, with a different text setting it will
+        result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), 
+                            {'grid' : 'wrong'}, range_level="relaxed")
+        assert len(result) == 1
+        result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), 
+                            {'grid' : 'wrong'}, range_level="none")
+        assert len(result) == 1
+
         result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), {'solarstrom' : 'wrong'})
         assert len(result) == 1
         result = sp.spellcheck_blacklist(getTestCasePhotovolataik(), {'stromnetz' : 'wrong'})
