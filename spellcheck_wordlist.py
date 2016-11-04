@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 """
-This bot spellchecks Wikipedia pages using a list of known "bad" words. 
+This bot spellchecks Wikipedia pages using a list of known "bad" words.
 It can be used in the following ways:
 
 spellcheck_wordlist.py Title
@@ -11,7 +11,7 @@ spellcheck_wordlist.py -cat:Category
 python spellcheck_wordlist.py -xmlfile:/path/to/wiki-latest-pages-articles.xml
     Check all pages in the given XML file
 python spellcheck_wordlist.py -searchWiki
-    Checks all pages containing the wrong word (using the websearch functionality) 
+    Checks all pages containing the wrong word (using the websearch functionality)
 
 Wordlists can be provided in one of following formats (note: all words need to be in lowercase):
 
@@ -24,7 +24,7 @@ Wordlists can be provided in one of following formats (note: all words need to b
 Command-line options:
 -batchNr:          Size of batches for the XML file processing
 
-A good example of a "blacklist" of words can, for example, be found at 
+A good example of a "blacklist" of words can, for example, be found at
 https://raw.githubusercontent.com/hroest/spellcheck-data/master/lists/de/perturbations.dic
 
 Example usage:
@@ -101,7 +101,7 @@ def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
         s = pagegenerators.SearchPageGenerator(wrong, number=NUMBER_PAGES, namespaces='0')
         gen = pagegenerators.PreloadingGenerator(s, pageNumber=NUMBER_PAGES)
 
-        # If we have no page to store our results, we probably want an interactive search and replace 
+        # If we have no page to store our results, we probably want an interactive search and replace
         if pageStore is None:
             print "Simple search and reaplce ... "
             blacklistChecker.simpleReplace(gen, wrong_lower, correct)
@@ -122,13 +122,13 @@ def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
             wrongwords = blacklistChecker.spellcheck_blacklist(
                 text, {wrong : correct}, return_words=True, title=page.title())
 
-            if len(wrongwords) == 0: 
+            if len(wrongwords) == 0:
                 continue
 
             title = page.title()
 
             # Skip pages
-            if title in wr.ignorePages: 
+            if title in wr.ignorePages:
                 continue
 
             # for w in page.words:
@@ -146,7 +146,7 @@ def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
                     continue
                 if wrong.lower() == correct.lower():
                     continue
-                
+
                 if wrong[0].lower() != wrong[0]:
                     # upper case
                     correct = correct[0].upper() + correct[1:]
@@ -590,13 +590,6 @@ def main():
             page.words = wrongwords
             wr.processWrongWordsInteractively( [page] )
 
-        # Print output
-        for k in sorted(wr.ignorePerPages):
-            vlist = wr.ignorePerPages[k]
-            for v in sorted(vlist):
-                print "* %s : %s" % (k, v)
-
-        print wr.dontReplace
         return
 
     print "Loaded wordlist of size", len(wordlist)
