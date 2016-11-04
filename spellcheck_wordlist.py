@@ -208,7 +208,12 @@ def loadPagesWiki(wr, correctWords_page, ignorePages_page):
     lines = text.split('* ')[1:]
     correctWords = {}
     for l in lines:
+
+        # split tuple, check that it contains two entries
         spl =  l.split(' : ')
+        if len(spl) != 2 :
+            continue
+
         tmp = correctWords.get( spl[0], [] )
         tmp.append( spl[1].strip() )
         correctWords[spl[0]] = tmp

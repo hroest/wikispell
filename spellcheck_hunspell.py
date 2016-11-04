@@ -268,7 +268,7 @@ def main():
                               minimal_word_size=4,
                               nosuggestions = nosuggestions,
                               language = language,
-                              stringent = stringent
+                              stringent = stringent,
                               composite_minlen = composite_minlen,
                               remove_dissimilar=remove_dissimilar,
                               common_words=common_words_dict)
