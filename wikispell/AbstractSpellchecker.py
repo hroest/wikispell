@@ -114,14 +114,14 @@ class abstract_Spellchecker(object):
             if mm: ran.append( [mm.start(), len(text)] )
 
         if removeNested:
-            ran = self.remove_nested_ranges(ran)
+            ran = self._remove_nested_ranges(ran)
 
         if mergeRanges:
-           ran = self.merge_ranges(ran)
+           ran = self._merge_ranges(ran)
 
-        return ran
+        return sorted(ran)
 
-    def merge_ranges(self, ran):
+    def _merge_ranges(self, ran):
         tmp = []
 
         if len(ran) == 0:
@@ -146,7 +146,7 @@ class abstract_Spellchecker(object):
 
         return tmp
 
-    def remove_nested_ranges(self, ran):
+    def _remove_nested_ranges(self, ran):
 
         def range_is_subset(ranges, r):
             for riter in ranges:
