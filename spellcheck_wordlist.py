@@ -103,7 +103,7 @@ def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
 
         # If we have no page to store our results, we probably want an interactive search and replace
         if pageStore is None:
-            print "Simple search and reaplce ... "
+            print "Simple search and replace ... "
             blacklistChecker.simpleReplace(gen, wrong_lower, correct)
             continue
 
@@ -201,7 +201,12 @@ def writeTyposToWikipedia(res, page_name):
 def loadPagesWiki(wr, correctWords_page, ignorePages_page):
     """
     Load list of correct words and ignored pages
+
+    We expect a list if tuples separated by ":" where the first entry is the
+    page title and the second entry is the "correct" word (e.g. which should
+    not be changed).
     """
+
     # Load correct words
     mypage = pywikibot.Page(pywikibot.getSite(), correctWords_page)
     text = mypage.get()
@@ -619,6 +624,7 @@ def main():
                     showRedirects=False, _filter_unique=pywikibot.tools.filter_unique)
 
         gen = pagegenerators.PreloadingGenerator(s, pageNumber=NUMBER_PAGES)
+
     elif xmlfile:
         if len(title) != 0:
             title = ' '.join(title)

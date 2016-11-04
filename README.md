@@ -13,11 +13,11 @@ Install
 Part of these scripts rely on libhunspell and pyhunspell. To install on an
 Ubuntu system, first install libhunspell
 
-        sudo apt-get install libhunspell-dev
+    sudo apt-get install libhunspell-dev python-hunspell
 
-Download the Python bindings from https://pypi.python.org/pypi/hunspell and install with
+To install the Python bindings manually, you can use pip
 
-        sudo python setup.py install
+    sudo pip install -U hunspell
 
 Then you need to install the dictionaries in your language:
 
@@ -29,7 +29,13 @@ Secondly, install the pywikibot
 
 git clone https://github.com/wikimedia/pywikibot-compat.git
 
-and add it to your PYTHONPATH
+and add it to your PYTHONPATH. Potentially it is better to use the newer core
+as it will be supported in the future
+
+git clone --recursive https://github.com/wikimedia/pywikibot-core.git
+
+You should then log in using the login.py script after you have created a
+user-config.py file (see the template).
 
 ## Install this software
 
@@ -38,6 +44,8 @@ pyhunspell are installed and in your PYTHONPATH).
 
 Usage
 -----
+
+For correct usage, you probably have to set PYTHONPATH to include the place where the pywikibot is installed as well as set the `PYWIKIBOT2_DIR` directory.
 
 ## Spellchecking
 
