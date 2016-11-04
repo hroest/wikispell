@@ -23,14 +23,50 @@ def findRange(opening, closing, text, start=0, alternativeBreak = None,
 class abstract_Spellchecker(object):
     """
     Base class for various spellcheckers
+
+    Contains the main code for identifying text that should not be included in
+    the spell checking. Possible usage
+    
+    >>> loc = 0
+    >>> curr_r = 0
+    >>> ranges = self.forbiddenRanges(text, level=level)
+        
+    >>> # Wordsearch using regex
+    >>> wordsearch = re.compile(r'([\s\=\<\>\_]*)([^\s\=\<\>\_/\-]+)')
+
+    >>> while True:
+
+    >>>     match = wordsearch.search(text, loc)
+    >>>     if not match:
+    >>>         break
+
+    >>>     curr_r, loc, in_nontext = self.check_in_ranges(
+    >>>         ranges, match.start(), match.end(), curr_r, loc)
+    >>>     if in_nontext:
+    >>>         continue
+
+    >>>     # Advance location
+    >>>     loc += len(match.group(1))
+    >>>     loc += len(match.group(2))
+
     """
 
     def forbiddenRanges(self, text, removeNested=True, mergeRanges=True, level="full"):
         """ Identify ranges where we do not want to spellcheck.
 
-        These ranges include templates, wiki links, tables etc
+        Args:
+            text(string) : The raw text
+            removeNested(boolean) : Whether to remove nested ranges
+            mergeRanges(boolean) : Whether to merge overlapping ranges
+            level(string) : The amount of filtering, one of [none, relaxed, fast, wiki-skip, full]
 
-        level is one of [none, relaxed, fast, wiki-skip, full]:
+        Returns:
+            tuple(start, end)
+                - start: start of excluded range
+                - end: end of excluded range
+
+        The level parameter controls the amount of filtering and is one of of
+        the following [none, relaxed, fast, wiki-skip, full]:
 
             none: do not remove any text
             relaxed: remove templates, tables, links, comments, italic, bold, tags, hyperlinks 

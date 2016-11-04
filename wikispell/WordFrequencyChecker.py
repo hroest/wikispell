@@ -5,8 +5,8 @@ A class used for frequency-based word processing.
 
 Use this class to identify potential candidates using find_candidates based on a given word.
 Then use load_candidates to identify pages in the Wiki where these words occur.
-Finally use checkit to go through the words.
 
+To process the words, use an interactive word replacer from Finally use checkit to go through the words.
 """
 #
 # Distributed under the terms of the MIT license.

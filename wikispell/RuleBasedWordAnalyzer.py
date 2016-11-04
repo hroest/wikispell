@@ -2,6 +2,8 @@
 # -*- coding: UTF-8 -*-
 """
 Uses a set of rules to exclude words to analyze
+
+This is mostly used by the hunspell spellchecker as it produces many false positives.
 """
 #
 # Distributed under the terms of the MIT license.

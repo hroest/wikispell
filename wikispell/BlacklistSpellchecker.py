@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 """
-A class for performing a spellcheck using a word list
+A class for performing a spellcheck using a given list of known false words.
 """
 
 #
@@ -17,8 +17,8 @@ from Word import Word, WrongWord
 class BlacklistSpellchecker(abstract_Spellchecker):
     """ Blacklist based spellchecker
 
-    This spellchecker reads in a "blacklist" of words that are commonly spelled
-    wrong and checks a gien text against this list.
+    This spellchecker uses a given set of known false words that are commonly
+    spelled wrong and checks a given text against this list.
 
     Possible usage
     >>> sp = BlacklistSpellchecker()
@@ -235,7 +235,7 @@ class BlacklistSpellchecker(abstract_Spellchecker):
 
     def simpleReplace(self, gen, wrong, correct, verbose=True):
         """ Replaces the word by a simple string operation
-        wrong word and go through them one by one.
+        and go through them one by one.
         """
 
         # Ensure that empty words do not trigger an exception

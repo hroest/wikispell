@@ -26,7 +26,7 @@ except ImportError:
     from pywikibot import pagegenerators
 
 class InteractiveWordReplacer(abstract_Spellchecker):
-    """ Interactivly replace individual words
+    """ Interactively replace individual words
 
     The main function is processWrongWordsInteractively which takes a list of
     page objects, each of which has a list of "WrongWord" objects attached to
@@ -48,6 +48,17 @@ class InteractiveWordReplacer(abstract_Spellchecker):
         """This will process pages with wrong words.
 
         It expects a list of pages with words attached to it.
+
+
+        Args:
+            pages(list(pywikibot.Page)) : The Wikipedia pages
+            reloadPages(boolean) : Whether to reload all pages (otherwise assumes they are loaded already)
+        Note that each pywikibot.Page is expected to have a list of
+        wikispell.WrongWord attached to it in a variable called "words" which
+        are the wrongly spelled words.
+
+        Returns:
+            None
         """
 
         self.performReplacementList = []
@@ -213,7 +224,9 @@ class InteractiveWordReplacer(abstract_Spellchecker):
         return text
 
 class InteractiveSearchReplacer(abstract_Spellchecker):
-    """ Interactivly replace individual words using search and replace
+    """ Interactively replace individual words using search and replace
+
+    Use the checkit function to replace words
     """
 
     def __init__(self, pm=None):
@@ -222,8 +235,20 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
 
     def checkit(self, pages, wrongs, g_correct, interactive=True):
         """
+        Interactively replaces a set of wrongly written words in multiple pages with a correct one.
+
         Takes a list of pages and associated wrong words and goes through them
-        one by one, asking user input to correct it.
+        one by one, asking user input to correct it.  Assumes that there is a
+        single correct word for all the pages.
+
+        Args:
+            pages(list(pywikibot.Page)) : The Wikipedia pages
+            wrongs(list(string) : The list of wrong words (one for each page)
+            g_correct(string) : The correct word (the same for all pages)
+            interactive(boolean) : Whether to run interactively
+
+        Returns:
+            string : Returns output in non-interactive mode that can be stored and processed later
         """
 
         output = ""
