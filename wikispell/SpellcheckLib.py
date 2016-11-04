@@ -3,7 +3,6 @@
 """
 A library of spellchecking helper classes and functions
 """
-
 #
 # Distributed under the terms of the MIT license.
 #

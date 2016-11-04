@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 
+#
+# Distributed under the terms of the MIT license.
+#
 
 test_sample1 = u"""{{Infobox Chemikalie
 | Name                = Aluminiumnitrat

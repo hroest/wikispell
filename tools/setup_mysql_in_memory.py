@@ -15,6 +15,9 @@ Run this script with 2 arguments
 This script will keep all words in memory and write them to a table after
 processing a whole XML dump.  Note that this can be memory intensive.
 """ 
+#
+# Distributed under the terms of the MIT license.
+#
 
 import MySQLdb
 import spellcheck

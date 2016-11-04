@@ -4,6 +4,9 @@
 A class used for permanent storage of wordlists
 
 """
+#
+# Distributed under the terms of the MIT license.
+#
 
 import re
 

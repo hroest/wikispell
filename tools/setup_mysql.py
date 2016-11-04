@@ -15,6 +15,9 @@ Run this script with 2 arguments
 This script will simply create a single table with all words, which then needs
 to processed further. Note that this can be disk-space intensive.
 """ 
+#
+# Distributed under the terms of the MIT license.
+#
 
 import MySQLdb
 import spellcheck

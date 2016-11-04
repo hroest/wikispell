@@ -8,6 +8,9 @@ Then use load_candidates to identify pages in the Wiki where these words occur.
 Finally use checkit to go through the words.
 
 """
+#
+# Distributed under the terms of the MIT license.
+#
 
 import re
 

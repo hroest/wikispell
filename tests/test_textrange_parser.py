@@ -3,6 +3,9 @@
 
 """Unit test for textrange_parser
 """
+#
+# Distributed under the terms of the MIT license.
+#
 
 import unittest
 import test_utils

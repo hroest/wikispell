@@ -4,6 +4,10 @@
 """Unit test for blacklist spellchecker
 """
 
+#
+# Distributed under the terms of the MIT license.
+#
+
 try:
     import wikipedia as pywikibot
 except ImportError:

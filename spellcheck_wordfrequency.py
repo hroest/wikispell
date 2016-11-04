@@ -18,6 +18,9 @@ Potential usage:
     python spellcheck_wordfrequency.py --db wikiwords.countedwords_20161020
 
 """
+#
+# Distributed under the terms of the MIT license.
+#
 
 import MySQLdb
 from wikispell.WordFrequencyChecker import WordFrequencyChecker

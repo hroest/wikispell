@@ -25,6 +25,9 @@ The main methods are:
                 is contained in the this_ignores array
 
 """
+#
+# Distributed under the terms of the MIT license.
+#
 
 import re
 
