@@ -5,6 +5,11 @@ This package provides a library and a set of scripts designed to spellcheck
 pages on Wikipedia. It uses the pywikibot project to interface with Mediawiki
 projects.
 
+Hacking
+-------
+
+Please read the [developers file](README_DEVELOPERS.md).
+
 Licence
 -----
 This code is released under the [MIT licence](LICENSE).
@@ -148,4 +153,11 @@ in Wikipedia and replaced with the correct word.
 
 This will read the MySQL database `wikiwords.countedwords_20161020` and use the
 stored word frequencies in it.
+
+Tools
+-----
+
+There are a set of tools in the `./tools` folder which allow for example to set
+up  the database used by the word frequency analysis (such as `setup_mysql.py`
+and `setup_mysql_in_memory.py`).
 
