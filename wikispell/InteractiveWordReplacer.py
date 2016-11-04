@@ -3,19 +3,16 @@
 """
 A library of spellchecking helper classes and functions
 """
-
 #
 # Distributed under the terms of the MIT license.
 #
-
-import time, sys
 
 # local imports
 from Word import Word
 from AbstractSpellchecker import abstract_Spellchecker
 from wikispell.PermanentWordlist import PermanentWordlist
 from Callback import CallbackObject
-import textrange_parser as ranges
+import textrange_parser
 
 ## pywikibot imports
 try:
@@ -34,17 +31,17 @@ class InteractiveWordReplacer(abstract_Spellchecker):
     question.
     """
 
-    def __init__(self, xmldump=None, pm=None):
+    def __init__(self, xmldump=None, permanentWordlist=None):
         self.ignorePages = []
 
         self.Callbacks = []
 
-        if pm is None:
-            pm = PermanentWordlist(None)
+        if permanentWordlist is None:
+            permanentWordlist = PermanentWordlist(None)
 
-        self.pm = pm
+        self.pm = permanentWordlist
 
-    def processWrongWordsInteractively(self, pages, offline=False, reloadPages=False):
+    def processWrongWordsInteractively(self, pages, reloadPages=False):
         """This will process pages with wrong words.
 
         It expects a list of pages with words attached to it.
@@ -229,9 +226,9 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
     Use the checkit function to replace words
     """
 
-    def __init__(self, pm=None):
+    def __init__(self, permanentWordlist=None):
 
-        self.pm = pm
+        self.pm = permanentWordlist
 
     def checkit(self, pages, wrongs, g_correct, interactive=True):
         """
@@ -250,6 +247,8 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
         Returns:
             string : Returns output in non-interactive mode that can be stored and processed later
         """
+
+        assert len(pages) == len(wrongs)
 
         output = ""
         for i,page in enumerate(pages):
@@ -275,7 +274,7 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
                 text = page.get()
 
             myranges = self.forbiddenRanges(text, level="moderate")
-            r = ranges.Ranges()
+            r = textrange_parser.Ranges()
             r.ranges = myranges
             ext_r = r.get_large_ranges()
 

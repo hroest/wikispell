@@ -27,7 +27,6 @@ class SpecialTerm(object):
     def __init__(self, text):
         self.style = text
 
-
 edit = SpecialTerm("edit")
 endpage = SpecialTerm("end page")
 

@@ -13,8 +13,6 @@ To process the words, use an interactive word replacer from Finally use checkit 
 #
 
 import re
-
-import textrange_parser as ranges
 import SpellcheckLib
 
 ## pywikibot imports
@@ -142,10 +140,11 @@ class WordFrequencyChecker():
                 if nr < occurrence_cutoff:
                     final_candidates.append(cand)
 
-        print "Removed %s due to high occurrence in the word count" % ( len(candidates) - len(final_candidates) )
+        print "Removed %s due to high occurrence in the word count" % (
+                len(candidates) - len(final_candidates) )
         candidates = final_candidates
 
-        # 7 Remove possibly correct candidates
+        # 7 Remove possibly correct candidates (in German they are likely derivative words)
         if applyFilter:
             if myw.endswith("em") or \
                myw.endswith("es") or \
@@ -160,7 +159,8 @@ class WordFrequencyChecker():
 
         # Get unique candidates sorted by ratio
         final_candidates = list(set(final_candidates))
-        final_candidates.sort(lambda x,y: cmp( Levenshtein.ratio(myw,x.decode('utf8')), Levenshtein.ratio(myw,y.decode('utf8')) ) )
+        final_candidates.sort(lambda x,y: cmp( 
+            Levenshtein.ratio(myw,x.decode('utf8')), Levenshtein.ratio(myw,y.decode('utf8')) ) )
 
 
         # print "sorted"
@@ -180,6 +180,7 @@ class WordFrequencyChecker():
             if self.pm.checkIsIgnored(None, wrong):
                 continue
 
+            # Depending on the bot version, we need different search page generation
             if newBot:
                 searchResult = list(pagegenerators.SearchPageGenerator(wrong, namespaces='0', total=max_cand))
             else:

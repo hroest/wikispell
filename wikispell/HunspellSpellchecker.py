@@ -239,12 +239,10 @@ class HunspellSpellchecker(abstract_Spellchecker):
         if self.correct_html_codes:
             text = removeHTML(text)
 
-        loc = 0
-
         # Get ranges
-        ranges = self.forbiddenRanges(text, level=level)
-        ranges = sorted(ranges)
+        loc = 0
         curr_r = 0
+        ranges = self.forbiddenRanges(text, level=level)
 
         # Check whether to use alternative spellchecker (e.g. swiss)
         schweiz_search = "<!--schweizbezogen-->"
