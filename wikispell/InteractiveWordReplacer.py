@@ -220,12 +220,13 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
 
         self.pm = pm
 
-    def checkit(self, pages, wrongs, g_correct):
+    def checkit(self, pages, wrongs, g_correct, interactive=True):
         """
         Takes a list of pages and associated wrong words and goes through them
         one by one, asking user input to correct it.
         """
 
+        output = ""
         for i,page in enumerate(pages):
             wrong = wrongs[i]
             correct = g_correct
@@ -292,11 +293,17 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
                         print "    Continue (no change)"
                         continue
 
+            if not interactive:
+                output += "{{User:HRoestTypo/V/Typo|%s|%s|%s}}\n" % (page.title(), wrong, correct)
+                continue
+
             pywikibot.showDiff(text, newtext)
             a = self._ask_user_input(page, mywrong, correct, newtext, text)
             if a is not None and a == "x":
                 print "Exit, go to next"
                 return
+
+        return output
 
     def _ask_user_input(self, page, wrong, correct, newtext, text):
         """
