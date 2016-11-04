@@ -30,7 +30,14 @@ class abstract_Spellchecker(object):
 
         These ranges include templates, wiki links, tables etc
 
-        level =  [none, relaxed, fast, wiki-skip, full]
+        level is one of [none, relaxed, fast, wiki-skip, full]:
+
+            none: do not remove any text
+            relaxed: remove templates, tables, links, comments, italic, bold, tags, hyperlinks 
+            fast: same as relaxed
+            wiki-skip: skip additional wiki syntax (including reftags)
+            full: also remove text in quotation marks, lists, trailing text (after weblinks)
+
         """
 
         if level == "none":

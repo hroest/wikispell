@@ -65,8 +65,8 @@ except ImportError:
     import pywikibot
 
 # local imports
-from RuleBasedWordAnalyzer import RuleBasedWordAnalyzer
 from Word import Word
+from RuleBasedWordAnalyzer import RuleBasedWordAnalyzer
 from SpellcheckLib import abstract_Spellchecker
 from SpellcheckLib import askAlternative
 from SpellcheckLib import cap, uncap, edit, endpage
@@ -103,12 +103,21 @@ class HunspellSpellchecker(abstract_Spellchecker):
         self.stringent = stringent
         self.remove_dissimilar = remove_dissimilar
 
-        self._wordAnalyzer = RuleBasedWordAnalyzer(minimal_word_size, multiple_occurence_tol, language, stringent, common_words, composite_minlen)
+        self._wordAnalyzer = RuleBasedWordAnalyzer(minimal_word_size,
+                                                   multiple_occurence_tol,
+                                                   language,
+                                                   stringent,
+                                                   common_words,
+                                                   composite_minlen)
 
         self._init_hunspell(hunspell_dict, language)
 
     def _init_hunspell(self, hunspell_dict, language):
+
         self.mysite = pywikibot.getSite()
+        if hunspell_dict is None:
+            raise Exception("Need to provide hunspell dictionary")
+
         self.hunspell = hunspell.HunSpell(hunspell_dict + ".dic", hunspell_dict + ".aff")
         self.hunspell_alternative = None
         if language == "DE":
@@ -218,6 +227,9 @@ class HunspellSpellchecker(abstract_Spellchecker):
 
     def spellcheck(self, text, forceAlternative=True, level="full"):
         """Uses hunspell to replace wrongly written words in a given text.
+
+        level controls how much text should be excluded from spellchecking:
+            - full: exclude as much as possible
 
         Returns the corrected text.
         """
