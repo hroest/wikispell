@@ -254,8 +254,8 @@ class SpellcheckBlacklistTestCase(unittest.TestCase):
         res = self.sp.forbiddenRanges(text, removeNested=False, mergeRanges=False)
         assert len(res) == 3
         assert res[0] == [0,18]
-        assert res[1] == [50,87]
-        assert res[2] == [24,107]
+        assert res[1] == [24,107]
+        assert res[2] == [50,87]
         assert text[18:24] + text[107:] == " TEXT  MORE TEXT"
 
         # 2. Remove nested only 
