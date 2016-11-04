@@ -45,6 +45,10 @@ class WordFrequencyChecker():
         """
         Find candidate misspellings for the input (correct) myw 
 
+        occurence_cutoff : consider all words above this cutoff as correct
+        lcutoff : Only consider candidates that are above this Levenshtein ratio
+        ldistance : Only consider candidates that are below this Levenshtein distance
+
         Searches for all words starting with the same 3 characters in
         Wikipedia, then selects candidates among those with a Levenshtein ratio
         of less than the given cutoff. Also the word occur less than
