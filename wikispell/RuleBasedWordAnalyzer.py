@@ -210,6 +210,7 @@ class RuleBasedWordAnalyzer():
 
                     other_part = smallword[i:].lower()
 
+                    # A few rules for English
                     if self.language == "EN":
                         if other_part in ["ly"]:
                             # print "Skip English composite word ending with ly: ", pr(sm)
@@ -218,22 +219,40 @@ class RuleBasedWordAnalyzer():
                             # print "Skip English composite word", pr(sm[0:i]), pr(sm[i:])
                             return True
 
+                    # Rest of the rules are for German
+
                     # Simple heuristic for german word combinations using "keit"
                     elif len(first_part) > 4 and other_part in ["keit"]:
                         # print "Skip: German combination", pr(sm[0:i]), "+", pr(sm[i:])
                         return True
 
-                    # We should not trust "endings" that are less than 3 characters long
-                    #   Some of them are allowed in German, so we should explicitely include them
+                    # We should not trust suffixes that are less than 3
+                    # characters long, but some of them are true declensions in
+                    # German. Note we still require the stem (root word) to be
+                    # of length 4 or more. These suffixes are listed
+                    # explicitely and allowed here:
+                    #
+                    #  - n/r/s/e/en/er/es/em mostly for adjectives
+                    #  - en, e, s, ei for nouns
+                    #
+                    #
                     #  - see https://de.wikipedia.org/wiki/Deutsche_Deklination#Grunds.C3.A4tze 
                     #  - see https://de.wikipedia.org/wiki/Deutsche_Deklination#Starke_Deklination_der_Adjektive
-                    elif len(other_part) < 3:
-                        if other_part in ["n", "r", "s", "e", "en", "er",  "es", "em"]:
-                            # print "Skip word according to German declension", smallword[0:i].encode("utf8"), "+", smallword[i:].encode("utf8")
+                    elif len(other_part) < 3 and len(first_part) > 3:
+
+                        if smallword[0].islower() and other_part in ["n", "r", "s", "e",
+                                "en", "er", "es", "em"]:
+                            # print "is lower: ", smallword[0].islower()
+                            # print "Skip: German declension", pr(sm[0:i]), "+", pr(sm[i:])
+                            return True
+
+                        elif smallword[0].isupper() and other_part in ["en", "ei", "e", "s"]:
+                            # print "Skip: upper ", smallword[0].isupper()
+                            # print "Skip: German declension", pr(sm[0:i]), "+", pr(sm[i:])
                             return True
 
                         elif other_part in self.common_words:
-                            # print "SPECIAL: strange ending!!!: ", "composite word", smallword[0:i].encode("utf8"), "+", smallword[i:].encode("utf8")
+                            # print "SPECIAL: strange ending!!!: ", pr(sm[0:i]), "+", pr(sm[i:])
                             pass
 
 
