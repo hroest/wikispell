@@ -167,8 +167,30 @@ class RuleBasedWordAnalyzer():
                         continue
 
                     elif other_part in self.common_words:
-                        # print "skip composite word", smallword[0:i].encode("utf8"), smallword[i:].encode("utf8")
-                        return True
+                        #  should have fugen-s
+                        #  - bei Zusammensetzungen mit Wörtern auf -tum, -ling, -ion, -tät, -heit, -keit, -schaft, -sicht, -ung 
+                        if self.language == "DE" and \
+                          (len(first_part) > 3 and first_part[-3:] in ["tum", "ion", u"tät", "ung"] or \
+                          first_part.endswith("ling") or \
+                          first_part.endswith("heit") or \
+                          first_part.endswith("keit") or \
+                          first_part.endswith("schaft") or \
+                          first_part.endswith("sicht") ):
+                            # Probably needs a fugen-s, we should now allow it 
+                            print "donot skip: missing fugen-s", kkk(sm[0:i]), kkk(sm[i:])
+                            pass
+                        else:
+                            ### print self.language == "DE" and len(first_part) > 3
+                            ### print first_part[-3:] in ["tum", "ion", u"tät", "ung"] 
+                            ### print "skip: composite word", kk[0:i], kk[i:]
+
+                            ### 
+                            ### # print first_part[-3:]
+                            ### print first_part[-3:] in ["tum", "ion", u"tät", "ung"]
+                            ### print first_part.encode("utf8")[-3:] in ["tum", "ion", u"tät", "ung"]
+
+                            print "skip: composite word", kkk(sm[0:i]), kkk(sm[i:])
+                            return True
 
                     elif i +2 < len(smallword) and smallword[i:i+1] == "s" and len(first_part) > 2:
                         # potential "Fugenlaut" in German, see https://de.wikipedia.org/wiki/Fugenlaut
