@@ -16,7 +16,7 @@ import time
 class RuleBasedWordAnalyzer():
 
     def __init__(self, minimal_word_size, multiple_occurrence_tol, language,
-                 stringent, common_words, composite_minlen):
+                 stringent, common_words, common_words_filter = None, composite_minlen = 0):
 
         self.minimal_word_size = minimal_word_size
         self.multiple_occurrence_tol = multiple_occurrence_tol
@@ -24,6 +24,11 @@ class RuleBasedWordAnalyzer():
         self.common_words = common_words
         self.composite_minlen = composite_minlen
         self.stringent = stringent
+
+        self.common_words_filter = common_words_filter
+        if self.common_words_filter is None:
+            self.common_words_filter = {}
+
 
     def skipWord(self, smallword, text, loc, use_alt):
         
@@ -48,13 +53,20 @@ class RuleBasedWordAnalyzer():
         if self.stringent > 1000:
             return False
 
-        #  (c) - Remove common words and words that we found more than once
+        #  (c) - Remove common words and words that are derivative of the
+        #        common word (plural in english, genetiv in german)
         #
+        if smallword.lower() in self.common_words_filter:
+            return True
+
         if smallword.lower() in self.common_words:
             return True
 
-        if len(smallword) > 3 and \
-          smallword[-1:] == 's' and smallword[:-1].lower() in self.common_words:
+        if self.language in ["DE", "EN"] and \
+          len(smallword) > 3 and \
+          smallword[-1:] == 's' and  \
+          (smallword[:-1].lower() in self.common_words or
+           smallword[:-1].lower() in self.common_words_filter ):
             return True
         
         #
