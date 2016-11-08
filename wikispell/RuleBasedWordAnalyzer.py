@@ -204,16 +204,24 @@ class RuleBasedWordAnalyzer():
                             print "Skip: x German declension", pr(sm[0:i]), "+", pr(sm[i:])
                             return True
 
+                # If the first part is a known good word, check whether we have
+                # a composite word
                 if first_part in self.common_words:
+
                     other_part = smallword[i:].lower()
 
                     if self.language == "EN":
                         if other_part in ["ly"]:
-                            # print "Skip English composite word ending with ly: ", smallword.encode("utf8")
+                            # print "Skip English composite word ending with ly: ", pr(sm)
                             return True
                         elif other_part in self.common_words:
-                            # print "Skip English composite word", smallword[0:i].encode("utf8"), smallword[i:].encode("utf8")
+                            # print "Skip English composite word", pr(sm[0:i]), pr(sm[i:])
                             return True
+
+                    # Simple heuristic for german word combinations using "keit"
+                    elif len(first_part) > 4 and other_part in ["keit"]:
+                        # print "Skip: German combination", pr(sm[0:i]), "+", pr(sm[i:])
+                        return True
 
                     # We should not trust "endings" that are less than 3 characters long
                     #   Some of them are allowed in German, so we should explicitely include them
