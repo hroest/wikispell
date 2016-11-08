@@ -54,7 +54,7 @@ sudo apt-get install hunspell-de-ch-frami
 # Distributed under the terms of the MIT license.
 #
 
-import re, sys
+import re, sys, os
 import string, codecs
 import hunspell, webbrowser
 import pickle
@@ -204,6 +204,7 @@ def main():
     pageStore = None
     correct_html_codes = False
     xmlfile = False
+    txtfiles = False
     language = "DE"
     level="full"
     stringent = 0
@@ -219,6 +220,8 @@ def main():
             category = arg[5:]
         elif arg.startswith("-keepDissimilar"):
             remove_dissimilar = False
+        elif arg.startswith("-textfiles:"):
+            txtfiles = arg[11:]
         elif arg.startswith("-excludeText:"):
             level = arg[13:]
         elif arg.startswith("-dictionary:"):
@@ -318,6 +321,20 @@ def main():
             for (page, length) in pywikibot.getSite().longpages(500):
                 yield page
         gen = wrapper_gen()
+    elif txtfiles:
+
+        ff = open(txtfiles)
+        files = [q.strip() for q in ff.readlines()]
+        for f in files:
+            print "file", f
+            if len(f) == 0: 
+                continue
+            text = open(f).read().decode("utf8")
+            text, wrongWords = sp.spellcheck(text)
+            for w in wrongWords:
+                print "*99", w.derive().encode("utf8")
+        return
+
     elif len(title) != 0:
         title = ' '.join(title)
         gen = [pywikibot.Page(pywikibot.getSite(),title)]
