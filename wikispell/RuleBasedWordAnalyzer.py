@@ -212,7 +212,7 @@ class RuleBasedWordAnalyzer():
                     elif self.language == "DE" and \
                             other_part[:len(other_part)-1] in self.common_words and \
                             len(first_part) > 2 and \
-                            len(other_part) > 4 and \
+                            len(other_part) > 4 + 1 and \
                             other_part[len(other_part)-1:] in ["n", "r", "s", "e"]:
                         # print "SPECIAL: skip composite word (1 letter)", smallword[0:i].encode("utf8"), "+", smallword[i:].encode("utf8")
                         return True
@@ -221,7 +221,7 @@ class RuleBasedWordAnalyzer():
                     elif self.language == "DE" and \
                             other_part[:len(other_part)-2] in self.common_words and \
                             len(first_part) > 2 and \
-                            len(other_part) > 5 and \
+                            len(other_part) > 4 + 2 and \
                             other_part[len(other_part)-2:] in ["en", "er",  "es", "em"]:
                         # print "SPECIAL: skip composite word (2 letter)", smallword[0:i].encode("utf8"), "+", smallword[i:].encode("utf8")
                         return True
