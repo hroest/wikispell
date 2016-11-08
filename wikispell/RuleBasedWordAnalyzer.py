@@ -195,8 +195,17 @@ class RuleBasedWordAnalyzer():
                     elif i +2 < len(smallword) and smallword[i:i+1] == "s" and len(first_part) > 2:
                         # potential "Fugenlaut" in German, see https://de.wikipedia.org/wiki/Fugenlaut
                         other_part = smallword[i+1:].lower()
-                        if other_part in self.common_words:
-                            # print "skip composite fugenlaut word", smallword[0:i].encode("utf8"), "+s+", smallword[i+1:].encode("utf8")
+
+                        # Exclude some cases where it should not occur
+                        # http://www.spiegel.de/kultur/zwiebelfisch/zwiebelfisch-der-gebrauch-des-fugen-s-im-ueberblick-a-293195.html
+                        if first_part[-2:] in ["er", "el", "en", "ss", u"ß", "st", "tz"] or \
+                           first_part.endswith("sch") or \
+                           first_part.endswith("s") or \
+                           first_part.endswith("z"):
+                            pass
+                            print "donot skip: should not have fugen-s", kkk(sm[0:i]), kkk(sm[i:])
+                        elif other_part in self.common_words:
+                            print "skip: composite fugenlaut", kkk(sm[0:i]), "+s+", kkk(sm[i+1:])
                             return True
 
                     # try composite word in German with 1-letter ending
