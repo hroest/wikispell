@@ -145,6 +145,59 @@ class RuleBasedWordAnalyzer():
 
                 if len(first_part) <= self.composite_minlen: 
                     continue
+                
+                ## 7 for Hopfield
+                COMPOSITE_MIX = 10
+                COMPOSITE_MIX = 7
+                COMPOSITE_DECL = True
+
+                # TODO: trial run !!! 
+                if self.stringent < 70 and first_part in self.common_words_filter:
+                    other_part = smallword[i:].lower()
+
+                    if len(first_part) > COMPOSITE_MIX and  \
+                        other_part in self.common_words:
+                        print "skip:  (filter+other) composite", pr(sm[0:i]), pr(sm[i:])
+
+                        if self.language == "DE" and \
+                          (len(first_part) > 3 and first_part[-3:] in ["tum", "ion", u"tät", "ung"] or \
+                          first_part.endswith("ling") or \
+                          first_part.endswith("heit") or \
+                          first_part.endswith("keit") or \
+                          first_part.endswith("schaft") or \
+                          first_part.endswith("sicht") ):
+                            # Probably needs a fugen-s, we should now allow it 
+                            print "donot skip: missing fugen-s", pr(sm[0:i]), pr(sm[i:])
+                            pass
+                        else:
+                            return True
+                            pass
+
+                    if COMPOSITE_DECL and len(first_part) > 5 and smallword[0].isupper() and other_part in ["keit"]:
+                        print "Skip: x German declension", pr(smallword[0:i]), "+", pr(sm[i:])
+                        # return True
+                        pass
+
+                    # For rather large words, we can be reasonably sure that
+                    # even if they are only filter words, we can look for some
+                    # declensions
+                    if COMPOSITE_DECL and len(other_part) < 3 and len(first_part) > 8:
+                        # if other_part in ["n", "r", "s", "e", "en", "er",  "es", "em"]:
+                        #     print "Skip: German declension", pr(sm[0:i]), "+", pr(sm[i:])
+                        #     return True
+
+                        if smallword[0].islower() and other_part in ["n", "r", "s", "e",
+                                # en, er, es, em mostly for adjectives
+                                "en", "er",  "es", "em"]:
+                            print "is lower: ", smallword[0].islower()
+                            print "Skip: x German declension", pr(sm[0:i]), "+", pr(sm[i:])
+                            return True
+
+                        elif smallword[0].isupper() and other_part in ["en", "ei", "e", "s"]:
+                            # potentially good
+                            print "Skip: upper ", smallword[0].isupper()
+                            print "Skip: x German declension", pr(sm[0:i]), "+", pr(sm[i:])
+                            return True
 
                 if first_part in self.common_words:
                     other_part = smallword[i:].lower()
