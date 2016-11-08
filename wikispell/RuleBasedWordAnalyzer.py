@@ -37,6 +37,11 @@ class RuleBasedWordAnalyzer():
         #  incorrect but also makes it much faster since the feature
         #  hunspell.suggest takes most time (~6x speedup).
 
+        # A few print functions, use as "pr(sm)"
+        sm = smallword
+        def pr(sm):
+            return sm.encode("utf8")
+
         #
         #  (a) - if it contains a number
         #
