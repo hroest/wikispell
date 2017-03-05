@@ -43,10 +43,10 @@ class RuleBasedWordAnalyzer():
         if loc > 2 and text[loc-2:loc] == ']]':
             return True
 
-        if self.stringent > 1000:
+        if self.stringent >= 1000:
             return False
 
-        #  (c) - Remove common words and words that we found more than once
+        #  (c) - Remove common words and words that we found more than once (also check plurals)
         #
         if smallword.lower() in self.common_words:
             return True
