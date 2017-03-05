@@ -141,8 +141,9 @@ class InteractiveWordReplacer(abstract_Spellchecker):
             # Print context
             pywikibot.output(u"    %s" % text[max(0,w.site-55):w.site+len(w)+55])
             choice = pywikibot.inputChoice('', ['Yes', 'yes', 'No', 'no',
-               'No but dont save', 'never replace' 'Replace by something else',
-                'Exit and go to next site'], ['y', '\\', 'n', ']', 'b', 'v', 'r', 'x'])
+               'No but dont save', 'never replace' 'Replace by something else', 
+               '<--!sic!-->',
+                'Exit and go to next site'], ['y', '\\', 'n', ']', 'b', 'v', 'r', 's','x'])
 
             # Evaluate user choice
             if choice == 'b':
@@ -158,6 +159,9 @@ class InteractiveWordReplacer(abstract_Spellchecker):
             if choice == 'r':
                 w.replacement = pywikibot.input(u"What should I replace \"%s\" by?"
                                               % bigword.word)
+                w.doReplace = True
+            if choice == 's':
+                w.replacement = bigword.word + '<--!sic!-->'
                 w.doReplace = True
 
             if choice in ( 'y','\\'):
@@ -301,7 +305,7 @@ class InteractiveSearchReplacer(abstract_Spellchecker):
             a = self._ask_user_input(page, mywrong, correct, newtext, text)
             if a is not None and a == "x":
                 print "Exit, go to next"
-                return
+                return output
 
         return output
 

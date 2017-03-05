@@ -483,7 +483,8 @@ def main():
             text = f.read().decode("utf8")
             f.close()
 
-        pages = {}
+        pages = []
+        page_dict = {}
         print "Will generate for ", len(text.splitlines()), "words"
 
         # Iterate through page with words to replace
@@ -501,17 +502,19 @@ def main():
                     print "skip", title, ":", wrongWord
                     continue
 
-                if title in pages:
-                    page = pages[title]
+                if title in page_dict:
+                    page = page_dict[title]
                     page.words.append( [ wrongWord, correctWord ] )
                 else:
                     page = pywikibot.Page(pywikibot.getSite(), title) 
                     page.words = [ [ wrongWord, correctWord ] ]
-                    pages[ title ] = page
+                    page_dict[ title ] = page
+                    # for correct ordering
+                    pages.append( page )
 
         # Retrive text for pages to work on
         print "Will generate for ", len(pages), "pages"
-        gen = pagegenerators.PreloadingGenerator(pages.values(), pageNumber=NUMBER_PAGES)
+        gen = pagegenerators.PreloadingGenerator(pages, pageNumber=NUMBER_PAGES)
 
         # Iterate all pages to work on
         wr = InteractiveWordReplacer()
