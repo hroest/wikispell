@@ -89,6 +89,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
                  multiple_occurrence_tol = 1, nosuggestions=False, 
                  language="DE", stringent = 0, composite_minlen = 0, 
                  remove_dissimilar = True,
+                 noCheckTwice = True,
                  common_words = set([]),
                  common_words_filter= set([])):
 
@@ -105,6 +106,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
         self._replaceBy = {}
         self.stringent = stringent
         self.remove_dissimilar = remove_dissimilar
+        self._noCheckTwice = noCheckTwice
 
         self._wordAnalyzer = RuleBasedWordAnalyzer(minimal_word_size,
                                                    multiple_occurrence_tol,
@@ -346,7 +348,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
             #
             #  - if we found it more than once, its probably correct
             #
-            if smallword in self._unknown:
+            if smallword in self._unknown and self._noCheckTwice: #  and False:
                 self._unknown.remove(smallword)
                 return 
 
