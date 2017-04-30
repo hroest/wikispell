@@ -306,12 +306,8 @@ def main():
                 common_words_filter_dict.add(w.lower())
             print "got data of size", len(common_words_filter_dict), "from de titles"
 
-        print "is it in,  de title"
-        print "rungem" in common_words_filter_dict
-
         if stringent < 55 and len(ARTICLES_EN) > 0:
 
-            # f = open("../spellcheck-data/output_en.txt")
             f = open(ARTICLES_EN)
             for i,l in enumerate(f):
                 w = l.strip().decode("utf8")
@@ -331,6 +327,7 @@ def main():
             common_words_dict.update( common_words_filter_dict )
 
         print "Got %s known good words from the supplied file" % len(common_words_dict)
+        print "Got %s known good words from the supplied file" % len(common_words_filter_dict)
 
     sp = HunspellSpellchecker(hunspell_dict = dictionary,
                               minimal_word_size=4,
