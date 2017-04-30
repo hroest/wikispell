@@ -204,6 +204,7 @@ def main():
     common_words = None
     nosuggestions = False
     remove_dissimilar = True
+    noCheckTwice = True
     pageStore = None
     correct_html_codes = False
     xmlfile = False
@@ -223,6 +224,8 @@ def main():
             category = arg[5:]
         elif arg.startswith("-keepDissimilar"):
             remove_dissimilar = False
+        elif arg.startswith("-noCheckTwice"):
+            noCheckTwice = False
         elif arg.startswith("-textfiles:"):
             txtfiles = arg[11:]
         elif arg.startswith("-excludeText:"):
@@ -237,7 +240,6 @@ def main():
             longpages = True
         elif arg.startswith("-minlen:"):
             composite_minlen = int(arg[8:])
-            print "minlen", composite_minlen
         elif arg.startswith("-nosugg"):
             nosuggestions = True
         elif arg.startswith("-language"):
@@ -337,6 +339,7 @@ def main():
                               stringent = stringent,
                               composite_minlen = composite_minlen,
                               remove_dissimilar=remove_dissimilar,
+                              noCheckTwice=noCheckTwice,
                               common_words=common_words_dict,
                               common_words_filter=common_words_filter_dict)
     sp.correct_html_codes = correct_html_codes
