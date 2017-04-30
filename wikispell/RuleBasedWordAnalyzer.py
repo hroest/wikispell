@@ -221,7 +221,7 @@ class RuleBasedWordAnalyzer():
                           first_part.endswith("schaft") or \
                           first_part.endswith("sicht") ):
                             # Probably needs a fugen-s, we should now allow it 
-                            print "donot skip: missing fugen-s", kkk(sm[0:i]), kkk(sm[i:])
+                            # print "donot skip: missing fugen-s", kkk(sm[0:i]), kkk(sm[i:])
                             pass
                         else:
                             ### print self.language == "DE" and len(first_part) > 3
@@ -233,7 +233,7 @@ class RuleBasedWordAnalyzer():
                             ### print first_part[-3:] in ["tum", "ion", u"tät", "ung"]
                             ### print first_part.encode("utf8")[-3:] in ["tum", "ion", u"tät", "ung"]
 
-                            print "skip: composite word", kkk(sm[0:i]), kkk(sm[i:])
+                            # print "skip: composite word", kkk(sm[0:i]), kkk(sm[i:])
                             return True
 
                     elif i +2 < len(smallword) and smallword[i:i+1] == "s" and len(first_part) > 2:
@@ -247,9 +247,9 @@ class RuleBasedWordAnalyzer():
                            first_part.endswith("s") or \
                            first_part.endswith("z"):
                             pass
-                            print "donot skip: should not have fugen-s", kkk(sm[0:i]), kkk(sm[i:])
+                            # print "donot skip: should not have fugen-s", kkk(sm[0:i]), kkk(sm[i:])
                         elif other_part in self.common_words:
-                            print "skip: composite fugenlaut", kkk(sm[0:i]), "+s+", kkk(sm[i+1:])
+                            # print "skip: composite fugenlaut", kkk(sm[0:i]), "+s+", kkk(sm[i+1:])
                             return True
 
                     # try composite word in German with 1-letter ending
