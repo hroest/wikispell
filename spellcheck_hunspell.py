@@ -79,6 +79,9 @@ from wikispell.SpellcheckLib import askAlternative
 from wikispell.InteractiveWordReplacer import InteractiveWordReplacer
 from wikispell.HunspellSpellchecker import HunspellSpellchecker
 
+ARTICLES_DE = ""
+ARTICLES_EN = ""
+
 def run_bot(allPages, sp, pageStore=None, level="full"):
     Callbacks = []
     stillSkip  = False;
@@ -254,6 +257,7 @@ def main():
         print "Language needs to be either DE or EN"
         return
 
+    common_words_filter_dict = set([])
     common_words_dict = set([])
 
     if stringent < 1000:
@@ -284,6 +288,45 @@ def main():
 
                     common_words_dict.add(w.lower())
 
+        if stringent < 58 and len(ARTICLES_DE) > 0:
+            # Get article titles as correct words
+            f = open(ARTICLES_DE)
+            for i,l in enumerate(f):
+                w = l.strip().decode("utf8")
+                # lets not trust words 2 or less
+                if len(w) < 3:
+                    continue
+                # lets not trust words 3 or less that start with or contain an upper case word
+                if len(w) < 4 and any ([ww.isupper() for ww in w]):
+                    continue
+                if any ([ww.isupper() for ww in l[1:] ]):
+                    continue
+                common_words_filter_dict.add(w.lower())
+            print "got data of size", len(common_words_filter_dict), "from de titles"
+
+        print "is it in,  de title"
+        print "rungem" in common_words_filter_dict
+
+        if stringent < 55 and len(ARTICLES_EN) > 0:
+
+            # f = open("../spellcheck-data/output_en.txt")
+            f = open(ARTICLES_EN)
+            for i,l in enumerate(f):
+                w = l.strip().decode("utf8")
+                # lets not trust words 2 or less
+                if len(w) < 3:
+                    continue
+                # lets not trust words 3 or less that start with or contain an upper case word
+                if len(w) < 4 and any ([ww.isupper() for ww in w]):
+                    pass
+                    continue
+                if any ([ww.isupper() for ww in l[1:] ]):
+                    continue
+                common_words_filter_dict.add(w.lower())
+            print "got data of size", len(common_words_filter_dict), "from en titles"
+
+        if stringent < 30 :
+            common_words_dict.update( common_words_filter_dict )
 
         print "Got %s known good words from the supplied file" % len(common_words_dict)
 
@@ -294,7 +337,8 @@ def main():
                               stringent = stringent,
                               composite_minlen = composite_minlen,
                               remove_dissimilar=remove_dissimilar,
-                              common_words=common_words_dict)
+                              common_words=common_words_dict,
+                              common_words_filter=common_words_filter_dict)
     sp.correct_html_codes = correct_html_codes
     sp.nosuggestions = nosuggestions
 
