@@ -83,8 +83,8 @@ def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
     i = 0
 
     correctWords_page = 'Benutzer:HRoestTypo/Tippfehler/all/correctWords'
-
     ignorePages_page = 'Benutzer:HRoestTypo/Tippfehler/all/ignorePages'
+
     wr = InteractiveWordReplacer()
     loadPagesWiki(wr, correctWords_page, ignorePages_page)
 
@@ -101,12 +101,14 @@ def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
         s = pagegenerators.SearchPageGenerator(wrong, number=NUMBER_PAGES, namespaces='0')
         gen = pagegenerators.PreloadingGenerator(s, pageNumber=NUMBER_PAGES)
 
-        # If we have no page to store our results, we probably want an interactive search and replace
+        # If we have no page to store our results, we probably want an
+        # interactive search and replace
         if pageStore is None:
             print "Simple search and replace ... "
             blacklistChecker.simpleReplace(gen, wrong_lower, correct)
             continue
 
+        # Otherwise continue with the non-interactive search and replace
         for page in gen:
 
             try:
@@ -158,6 +160,10 @@ def doSearchWiki(wordlist, blacklistChecker, pageStore=None):
             print "put page with content:", output
             mypage = pywikibot.Page(pywikibot.getSite(), pageStore)
             mypage.put(output,  u'Update' )
+
+    # One final update
+    mypage = pywikibot.Page(pywikibot.getSite(), pageStore)
+    mypage.put(output,  u'Update' )
 
 def writeTyposToWikipedia(res, page_name):
     """
@@ -612,8 +618,9 @@ def main():
 
     if searchWiki:
 
-        doSearchWiki(wordlist, blacklistChecker)
+        doSearchWiki(wordlist, blacklistChecker, pageStore=pageStore)
         return
+
     elif recentChanges:
 
         try:
@@ -632,7 +639,7 @@ def main():
             title = ""
 
         processXMLWordlist(xmlfile, wordlist, breakUntil = title, batchNr=batchNr,
-                           doNoninteractive=non_interactive,pageStore=pageStore)
+                           doNoninteractive=non_interactive, pageStore=pageStore)
         return
 
     elif category:
