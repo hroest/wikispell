@@ -89,7 +89,8 @@ class HunspellSpellchecker(abstract_Spellchecker):
                  multiple_occurrence_tol = 1, nosuggestions=False, 
                  language="DE", stringent = 0, composite_minlen = 0, 
                  remove_dissimilar = True,
-                 common_words = set([])):
+                 common_words = set([]),
+                 common_words_filter= set([])):
 
         self._nosuggestions = nosuggestions
         self.correct_html_codes = False
@@ -110,6 +111,7 @@ class HunspellSpellchecker(abstract_Spellchecker):
                                                    language,
                                                    stringent,
                                                    common_words,
+                                                   common_words_filter,
                                                    composite_minlen)
 
         self._init_hunspell(hunspell_dict, language)
