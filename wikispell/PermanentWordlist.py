@@ -25,8 +25,10 @@ class PermanentWordlist():
 
         # A dictionary of {wrong : correct}
         self.replace = {}
+
         # A list of words that are correct
         self.noall = set([])
+
         # A count of which wrong words were replaced how often
         self.rcount = {}
 
