@@ -256,14 +256,34 @@ def main():
 
     common_words_dict = set([])
 
-    if True:
+    if stringent < 1000:
         if common_words is not None:
             for wordfile in common_words.split(";"):
                 if len(wordfile) == 0:
                     continue
                 f = open(wordfile)
                 for l in f:
-                    common_words_dict.add(l.strip().decode("utf8").lower())
+                    w = l.strip().decode("utf8")
+
+                    # lets not trust two letter combinations
+                    if len(w) < 3:
+                        continue
+
+                    if len(w) == 2:
+                        if w[0] == w[1]:
+                            continue
+
+                    ### # TODO: important ?
+                    ### if len(w) < 4:
+                    ###     continue
+                    ### # old rule ... 
+                    ### if len(w) < 4 and any ([ww.isupper() for ww in w]):
+                    ###     continue
+                    ### if any ([ww.isupper() for ww in l[1:] ]):
+                    ###     continue
+
+                    common_words_dict.add(w.lower())
+
 
         print "Got %s known good words from the supplied file" % len(common_words_dict)
 
