@@ -23,6 +23,7 @@ Ubuntu system, first install libhunspell
 To install the Python bindings manually, you can use pip
 
     sudo pip install -U hunspell
+    sudo pip install -U python-Levenshtein
 
 Then you need to install the dictionaries in your language:
 
@@ -37,7 +38,11 @@ git clone https://github.com/wikimedia/pywikibot-compat.git
 and add it to your PYTHONPATH. Potentially it is better to use the newer core
 as it will be supported in the future
 
-git clone --recursive https://github.com/wikimedia/pywikibot-core.git
+	git clone --recursive https://github.com/wikimedia/pywikibot-core.git
+	cd pywikibot-core
+	python generate_user_files.py
+	python scripts/login.py
+
 
 You should then log in using the login.py script after you have created a
 user-config.py file (see the template).
