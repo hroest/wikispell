@@ -67,7 +67,7 @@ class BlacklistSpellchecker(abstract_Spellchecker):
                 break
 
             if verbose:
-                print j, "Check '%s'" % text[ match.start():match.end()], "at loc", loc
+                print j, "Check '%s'" % text[ match.start():match.end()].encode("utf8"), "at loc", loc
 
             # Check if we are in forbidden range
             curr_r, loc, in_nontext = self.check_in_ranges(ranges, 
@@ -93,7 +93,7 @@ class BlacklistSpellchecker(abstract_Spellchecker):
             smallword = bigword.derive()
 
             if verbose:
-                print "    ==> smallword", smallword
+                print "    ==> smallword", smallword.encode("utf8")
 
             done = False
             for r in ranges:
@@ -102,6 +102,8 @@ class BlacklistSpellchecker(abstract_Spellchecker):
                 if r[1] == loc_start:
                     loc += LocAdd
                     done = True
+                    if verbose:
+                        print "    we are done with ", smallword.encode("utf8"), "due to range", r
 
             if done:
                 continue
@@ -117,6 +119,8 @@ class BlacklistSpellchecker(abstract_Spellchecker):
             #use this code to insert into the database
             if return_for_db:
                 if not done:
+                    if verbose: print "    ===> append word for db: ", smallword.encode("utf8")
+
                     wrongWords.append(smallword)
 
             else:
@@ -140,8 +144,8 @@ class BlacklistSpellchecker(abstract_Spellchecker):
 
             # We advance the location by the characters of the word (group 2)
             loc += LocAdd
-            if verbose:
-                print "    new loc (after accounting for word)", loc, "we are at", text[loc]
+            if verbose and len(text) > loc:
+                print "    new loc (after accounting for word)", loc, "we are at", text[loc].encode("utf8")
 
         return wrongWords
 
