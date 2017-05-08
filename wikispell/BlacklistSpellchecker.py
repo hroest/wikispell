@@ -31,7 +31,7 @@ class BlacklistSpellchecker(abstract_Spellchecker):
 
     def spellcheck_blacklist(self, text, badDict, return_for_db=False,
                              return_words=False, title=None, verbose=False,
-                             range_level="moderate"):
+                             range_level="full"):
         """ Checks a single text against the words in the blacklist and returns
         a list of wrong words.
         """
@@ -46,13 +46,18 @@ class BlacklistSpellchecker(abstract_Spellchecker):
         prepare = []
         j = 0
 
-        while True:
-            #added "/" to first since sometimes // is in the text
-            #added "/" to second since in german some words are compositions
+        # Regex to find next word: look for any whitespace or control
+        # characters followed by a "word" stopping at the next whitespace or
+        # control character.
+        wordsearch = re.compile(r'([\s\=\<\>\_/-]*)([^\s\=\<\>\_/\-|]+)')
+        if self._testcase_compat:
             wordsearch = re.compile(r'([\s\=\<\>\_/-]*)([^\s\=\<\>\_/\-]+)')
-            #wordsearch = re.compile(r'([\s\=\<\>\_]*)([^\s\=\<\>\_/\-]+)') #old one
+
+        while True:
+
             if verbose:
                 print "== Start wordsearch at location", loc
+
             match = wordsearch.search(text,loc)
             LocAdd = 0
             j = j + 1
