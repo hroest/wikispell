@@ -172,7 +172,6 @@ class SpellcheckWordParse(unittest.TestCase):
     def test_words_lit(self):
 
         # Test whether we correctly filter things inside German quotation marks and lists
-        print getTestCaseLit()
         result = self.sp.spellcheck_blacklist(getTestCaseLit(), {'positiver' : 'wrong'}, return_for_db=True, range_level="fast")
         assert len(result) == 18, len(result)
         result = [r for r in result if len(r) >= 3] # legacy
@@ -181,7 +180,6 @@ class SpellcheckWordParse(unittest.TestCase):
 
         # Filter out all lists and images, only one word is left
         result = self.sp.spellcheck_blacklist(getTestCaseLit(), {'positiver' : 'wrong'}, return_for_db=True, range_level="full")
-        print result
         assert len(result) == 1, len(result)
         assert result == [u"Literatur"]
 
