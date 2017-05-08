@@ -38,6 +38,9 @@ class abstract_Spellchecker(object):
             wiki-skip: skip additional wiki syntax (including reftags)
             full: also remove text in quotation marks, lists, trailing text (after weblinks)
 
+            moderate-legacy: legacy mode that is the same as relaxed but also removes
+                words inside quotation marks (single, French, German)
+
         """
 
         if level == "none":
@@ -57,7 +60,7 @@ class abstract_Spellchecker(object):
         # Quotation marks
         # See https://de.wikipedia.org/wiki/Anf%C3%BChrungszeichen#Kodierung
 
-        if level in ["full"]:
+        if level in ["full", "moderate-legacy"]:
             # Simple quotation marks
             ran.extend(findRange('\"', '\"', text,
                 alternativeBreak = albr + extrabr)[0] )
