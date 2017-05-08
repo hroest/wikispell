@@ -163,17 +163,93 @@ class SpellcheckWordParse(unittest.TestCase):
         self.sp = BlacklistSpellchecker()
 
     def test_words_frieden(self):
-        return
 
+        # Test whether we correctly filter things inside lists, quotation marks, wikilinks etc
         result = self.sp.spellcheck_blacklist(getTestCaseFrieden(), {'positiver' : 'wrong'}, return_for_db=True)
         assert len(result) == 21
         assert result == [u'unterscheidet', u'man', u'zwischen', u'dem', u'oben', u'genannten', u'der', u'die', u'Abwesenheit', u'von', u'beinhaltet', u'und', u'einem', u'Letzterer', u'umfasst', u'neben', u'dem', u'Fehlen', u'kriegerischer', u'Gewalt', u'bei']
 
-    def test_words_pietismus(self):
+    def test_words_lit(self):
 
-        result = self.sp.spellcheck_blacklist(getTestCaseLit(), {'positiver' : 'wrong'}, return_for_db=True)
+        # Test whether we correctly filter things inside German quotation marks and lists
+        print getTestCaseLit()
+        result = self.sp.spellcheck_blacklist(getTestCaseLit(), {'positiver' : 'wrong'}, return_for_db=True, range_level="fast")
+        assert len(result) == 18, len(result)
+        result = [r for r in result if len(r) >= 3] # legacy
         assert len(result) == 16, len(result)
         assert result ==  [u'Literatur', u'Tobias', u'Burg', u'M\xfcnster', u'zur', u'Signatur', u'von', u'Werken', u'der', u'Bildenden', u'Kunst', u'Angelika', u'Seibt', u'Beck', u'M\xfcnchen', u'Weblinks']
+
+        # Filter out all lists and images, only one word is left
+        result = self.sp.spellcheck_blacklist(getTestCaseLit(), {'positiver' : 'wrong'}, return_for_db=True, range_level="full")
+        print result
+        assert len(result) == 1, len(result)
+        assert result == [u"Literatur"]
+
+    def test_words_pietismus(self):
+
+        # This test checks that poems / quotes are not spellchecked...
+        self.sp._testcase_compat = True
+
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="full")
+        assert len(result) == 27
+        assert result == [u'Als', u'positive', u'Selbstbezeichnung', u'hat', u'erstmals', u'der', u'pietistische', u'Leipziger', u'Professor', u'das', u'Wort', u'verwendet', u'poem', u'Oktober', u'folgte', u'Fellers', u'Bekenntnis', u'dem', u'Sonett', u'auf', u'den', u'verstorbenen', u'Leipziger', u'Kaufmann', u'Joachim', u'G\xf6ring', u'poem'], result
+
+        # Using moderate vs relaxed we either get German quotation marks or not
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="moderate-legacy")
+        assert len(result) == 27, len(result)
+        assert not "Pietist" in result
+
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="relaxed")
+        assert len(result) == 28, len(result)
+        assert "Pietist" in result
+
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="none")
+        assert len(result) == 54, len(result)
+        assert "Pietist" in result
+
+    def test_words_pietismus_new(self):
+
+        # This test checks that poems / quotes are not spellchecked...
+        self.sp._testcase_compat = False
+
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="full")
+        assert len(result) == 29, len(result)
+        result = [r for r in result if len(r) >= 3] # legacy
+        assert len(result) == 27, len(result)
+        assert result == [u'Als', u'positive', u'Selbstbezeichnung', u'hat', u'erstmals', u'der', u'pietistische', u'Leipziger', u'Professor', u'das', u'Wort', u'verwendet', u'poem', u'Oktober', u'folgte', u'Fellers', u'Bekenntnis', u'dem', u'Sonett', u'auf', u'den', u'verstorbenen', u'Leipziger', u'Kaufmann', u'Joachim', u'G\xf6ring', u'poem'], result
+
+        # Using moderate vs relaxed we either get German quotation marks or not
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="moderate-legacy")
+        assert len(result) == 29, len(result)
+        assert not "Pietist" in result
+
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="relaxed")
+        assert len(result) == 30, len(result)
+        assert "Pietist" in result
+
+        result = self.sp.spellcheck_blacklist(
+                getTestCasePietismus(), {'positiver' : 'wrong'}, 
+                return_for_db=True, range_level="none")
+        assert len(result) == 65, len(result)
+        assert "Pietist" in result
+
+    def test_words_unterschrift(self):
+
+        self.sp._testcase_compat = True
 
         mypage = pywikibot.Page(pywikibot.getSite(), 'Unterschrift')
         text = mypage.getOldVersion(128568384)
@@ -185,18 +261,24 @@ class SpellcheckWordParse(unittest.TestCase):
         result = self.sp.spellcheck_blacklist(text, {'positiver' : 'wrong'},
                             return_for_db=True, range_level="full")
         assert len(result) == 1666, len(result)
+        oldr = result
 
-        result = self.sp.spellcheck_blacklist(
-                getTestCasePietismus(), {'positiver' : 'wrong'}, 
-                return_for_db=True, range_level="full")
-        assert len(result) == 27
-        assert result == [u'Als', u'positive', u'Selbstbezeichnung', u'hat', u'erstmals', u'der', u'pietistische', u'Leipziger', u'Professor', u'das', u'Wort', u'verwendet', u'poem', u'Oktober', u'folgte', u'Fellers', u'Bekenntnis', u'dem', u'Sonett', u'auf', u'den', u'verstorbenen', u'Leipziger', u'Kaufmann', u'Joachim', u'G\xf6ring', u'poem'], result
+        #### NEW
 
-        result = self.sp.spellcheck_blacklist(
-                getTestCasePietismus(), {'positiver' : 'wrong'}, 
-                return_for_db=True, range_level="moderate")
-        assert len(result) == 28, len(result)
+        self.sp._testcase_compat = False
 
+        result = self.sp.spellcheck_blacklist(text, {'positiver' : 'wrong'},
+                        return_for_db=True, range_level="none")
+        assert len(result) == 3103, len(result)
+
+        result = self.sp.spellcheck_blacklist(text, {'positiver' : 'wrong'},
+                            return_for_db=True, range_level="full")
+        assert len(result) == 1804, len(result)
+        result = [r for r in result if len(r) >= 3]
+        assert len(result) == 1702, len(result)
+        result = [r for r in result if r not in ["Abs", "Namens", "Oberlandesgerichts"] ]
+        result = [r for r in result if r not in ["Dies", "Doppelnamens", "will", "Linien", u"übernehmen"] ] # FP 
+        assert len(result) == 1682, len(result)
 
 
 # ##########################################################################
