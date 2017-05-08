@@ -27,6 +27,7 @@ class BlacklistSpellchecker(abstract_Spellchecker):
 
     def __init__(self):
         self.rcount = {}
+        self._testcase_compat = False
 
     def spellcheck_blacklist(self, text, badDict, return_for_db=False,
                              return_words=False, title=None, verbose=False,
@@ -102,7 +103,8 @@ class BlacklistSpellchecker(abstract_Spellchecker):
 
             # We advance the location by the characters skipped (group 1)
             loc += len(match.group(1))
-            done = self._text_skip(text, loc, smallword, title)
+            if range_level != "none" or self._testcase_compat:
+                done = self._text_skip(text, loc, smallword, title, return_for_db)
             if verbose:
                 print "    new loc (after accounting for skipped chars)", loc, "which is '%s'" % match.group(1)
 
@@ -138,10 +140,10 @@ class BlacklistSpellchecker(abstract_Spellchecker):
 
         return wrongWords
 
-    def _text_skip(self, text, loc, word, title=None):
+    def _text_skip(self, text, loc, word, title=None, return_for_db=False):
 
-        #exclude words that are smaller than 3 letters
-        if len( word.lower() ) < 3: 
+        # Skip empty words
+        if len(word.strip()) == 0:
             return True
 
         # if we have ''' before, we dont want to interpret
@@ -153,16 +155,16 @@ class BlacklistSpellchecker(abstract_Spellchecker):
         if loc > 17 and text[loc-17:loc] == '<nowiki></nowiki>':
             return True
 
-        # if we have a closing wikilink "]]" before, we dont want to interpret
+        # If the word is part of a Wikilink, e.g. we have a closing wikilink
+        # "]]" before, we dont want to interpret it: [[Some]]Word should not be
+        # checked.
         if loc > 2 and text[loc-2:loc] == ']]':
             return True
 
-        # try to find out whether its an abbreviation and has a '.' without capitalization
-        if loc+len(word)+5 < len(text) and \
-           text[loc+len(word)] == '.' and \
-           text[loc+len(word)+2].islower() and \
-           not text[loc+len(word):loc+len(word)+5] == '<ref>':
-            return True
+        # Skip words that have uppercase letters in the middle
+        for l in word[1:]:
+            if l.isupper():
+                return True
 
         # words that end with ' or -
         if loc+len(word) < len(text) and text[loc+len(word)] == '-':
@@ -172,10 +174,23 @@ class BlacklistSpellchecker(abstract_Spellchecker):
         if loc > 1 and text[loc-1] == "-" and text[loc-2] == " ":
             return True
 
-        #exclude words that have uppercase letters in the middle
-        for l in word[1:]:
-            if l.isupper(): 
-                return True
+        # Early return for database generation (the ones following are still
+        # words but probably should not be checked)
+        if return_for_db and not self._testcase_compat:
+            return False
+
+        # Skip words that are smaller than 3 letters
+        if len( word.lower() ) < 3:
+            return True
+
+        # Skip words that are probably abbreviations: check for a final '.'
+        # that is not followed by capitalization
+        # not (text[loc+len(word):loc+len(word)+5] == '<ref>' or text[loc+len(word):loc+len(word)+6] == '.<ref>'):
+        if loc+len(word)+5 < len(text) and \
+           text[loc+len(word)] == '.' and \
+           text[loc+len(word)+2].islower() and \
+           not text[loc+len(word):loc+len(word)+5] == '<ref>':
+            return True
 
         # Get possible genetiv, derive word stem and search whether the word
         # occurs somewhere in the text
@@ -239,7 +254,7 @@ class BlacklistSpellchecker(abstract_Spellchecker):
         """
 
         # Ensure that empty words do not trigger an exception
-        if len(wrong) == 0 or len(correct) == 0: 
+        if len(wrong) == 0 or len(correct) == 0:
             return
 
         for page in gen:
